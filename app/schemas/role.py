@@ -23,7 +23,7 @@ class RoleInDBBase(RoleBase):
     id: UUID4
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 # Additional properties to return via API

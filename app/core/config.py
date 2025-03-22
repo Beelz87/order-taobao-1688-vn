@@ -1,8 +1,9 @@
 from functools import lru_cache
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
-from pydantic import PostgresDsn, validator
-from pydantic_settings import BaseSettings
+from pydantic import PostgresDsn
+from pydantic.functional_validators import field_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -25,23 +26,27 @@ class Settings(BaseSettings):
 
     SQLALCHEMY_DATABASE_URI: Optional[PostgresDsn] = None
 
-    @validator("SQLALCHEMY_DATABASE_URI", pre=True)
-    def assemble_db_connection(
-        cls, v: Optional[str], values: Dict[str, Any]
-    ) -> Any:
-        if isinstance(v, str):
+    @field_validator("SQLALCHEMY_DATABASE_URI", mode='after')
+    @classmethod
+    def assemble_db_connection(cls, v: Optional[str], info: Any) -> Optional[str]:
+        if v is not None:
             return v
+
+        data = info.data  # ✅ get the data from ValidationInfo
+
         return PostgresDsn.build(
             scheme="postgresql",
-            username=values.get("DB_USER"),
-            password=values.get("DB_PASSWORD"),
-            host=values.get("DB_HOST"),
-            path=f"/{values.get('DB_NAME') or  ''}",
-        )
+            username=data["DB_USER"],
+            password=data["DB_PASSWORD"],
+            host=data["DB_HOST"],
+            port=5432,
+            path=f"{data['DB_NAME']}",
+        ).__str__()
 
-    class Config:
-        case_sensitive = True
-        env_file = ".env"
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        case_sensitive=True
+    )
 
 
 @lru_cache()
