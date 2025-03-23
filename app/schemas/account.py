@@ -8,8 +8,8 @@ from pydantic import UUID4, BaseModel
 class AccountBase(BaseModel):
     name: Optional[str]
     description: Optional[str]
-    current_subsription_ends: Optional[datetime]
-    plan_id: Optional[UUID4]
+    current_subscription_ends: Optional[datetime] = None
+    plan_id: Optional[UUID4] = None
     is_active: Optional[bool] = True
 
 

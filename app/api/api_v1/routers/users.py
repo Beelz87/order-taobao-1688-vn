@@ -122,7 +122,7 @@ def create_user_open(
     if user:
         raise HTTPException(
             status_code=409,
-            detail="The user with this username already exists in the system",
+            detail="The user with this email already exists in the system",
         )
     user_in = schemas.UserCreate(
         password=password,
