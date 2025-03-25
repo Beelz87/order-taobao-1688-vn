@@ -38,13 +38,14 @@ def get_url():
     user = settings.DB_USER
     password = settings.DB_PASSWORD
     host = settings.DB_HOST
+    db_port = settings.DB_PORT
     db = (
         settings.DB_NAME
         if settings.ENVIRONMENT in ["prod", "dev"]
         else f"{settings.DB_NAME}_test"
     )
 
-    return f"postgresql://{user}:{password}@{host}/{db}"
+    return f"postgresql://{user}:{password}@{host}:{db_port}/{db}"
 
 
 def run_migrations_offline():

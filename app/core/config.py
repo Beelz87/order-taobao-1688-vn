@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int
     USERS_OPEN_REGISTRATION: str
 
+    PORT: int
     ENVIRONMENT: Optional[str]
 
     FIRST_SUPER_ADMIN_EMAIL: str
@@ -20,15 +21,16 @@ class Settings(BaseSettings):
     FIRST_SUPER_ADMIN_ACCOUNT_NAME: str
 
     DB_HOST: str
+    DB_PORT: int
     DB_USER: str
     DB_PASSWORD: str
     DB_NAME: str
 
     SQLALCHEMY_DATABASE_URI: Optional[PostgresDsn] = None
 
-    @field_validator("SQLALCHEMY_DATABASE_URI", mode='after')
+    @field_validator("SQLALCHEMY_DATABASE_URI", mode='before')
     @classmethod
-    def assemble_db_connection(cls, v: Optional[str], info: Any) -> Optional[str]:
+    def assemble_db_connection(cls, v: Optional[str], info: Any) -> Optional[PostgresDsn]:
         if v is not None:
             return v
 
@@ -39,9 +41,9 @@ class Settings(BaseSettings):
             username=data["DB_USER"],
             password=data["DB_PASSWORD"],
             host=data["DB_HOST"],
-            port=5432,
+            port=data["DB_PORT"],
             path=f"{data['DB_NAME']}",
-        ).__str__()
+        )
 
     model_config = SettingsConfigDict(
         env_file=".env",
