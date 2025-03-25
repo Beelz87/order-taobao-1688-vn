@@ -1,0 +1,38 @@
+from pydantic import BaseModel
+
+
+class ExchangeBase(BaseModel):
+    name: str
+    description: str
+    foreign_currency: str
+    local_currency: str
+    is_active: bool
+    rate: float
+    type: int
+
+
+class ExchangeCreate(ExchangeBase):
+    pass
+
+class ExchangeUpdate(BaseModel):
+    foreign_currency: str
+    local_currency: str
+    is_active: bool
+    rate: float
+    type: int
+
+class ExchangeInDBBase(ExchangeBase):
+    id: str
+
+    class Config:
+        from_attributes = True
+
+
+# Additional properties to return via API
+class Exchange(ExchangeInDBBase):
+    pass
+
+
+# Additional properties stored in DB
+class ExchangeInDB(ExchangeInDBBase):
+    pass
