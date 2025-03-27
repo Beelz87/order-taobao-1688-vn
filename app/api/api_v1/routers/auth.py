@@ -33,7 +33,7 @@ def login_access_token(
         minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
     )
     if not user.user_role:
-        role = "GUEST"
+        role = "USER"
     else:
         role = user.user_role.role.name
     token_payload = {

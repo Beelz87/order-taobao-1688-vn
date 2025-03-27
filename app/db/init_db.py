@@ -1,7 +1,11 @@
+from sqlalchemy.testing.suite.test_reflection import users
+
 from app import crud, schemas
 from app.constants.role import Role
 from app.core.config import settings
 from sqlalchemy.orm import Session
+
+from app.crud import user_role
 
 
 def init_db(db: Session) -> None:
@@ -32,12 +36,12 @@ def init_db(db: Session) -> None:
         user = crud.user.create(db, obj_in=user_in)
 
     # Create Role If They Don't Exist
-    guest_role = crud.role.get_by_name(db, name=Role.GUEST["name"])
-    if not guest_role:
-        guest_role_in = schemas.RoleCreate(
-            name=Role.GUEST["name"], description=Role.GUEST["description"]
+    user_role = crud.role.get_by_name(db, name=Role.USER["name"])
+    if not user_role:
+        user_role_in = schemas.RoleCreate(
+            name=Role.USER["name"], description=Role.USER["description"]
         )
-        crud.role.create(db, obj_in=guest_role_in)
+        crud.role.create(db, obj_in=user_role_in)
 
     account_admin_role = crud.role.get_by_name(
         db, name=Role.ACCOUNT_ADMIN["name"]

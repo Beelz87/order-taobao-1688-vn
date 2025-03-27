@@ -20,9 +20,20 @@ class ShippingOrderBase(BaseModel):
     height_packaged: float
     wide_packaged: float
     length_packaged: float
-    wood_packaged_fee: float
     created_at: datetime
     updated_at: datetime
+
+    contains_liquid: bool = False
+    is_fragile: bool = False
+    wooden_packaging_required: bool = False
+    insurance_required: bool = False
+    item_count_check_required: bool = False
+
+    contains_liquid_fee: float = 0.0
+    is_fragile_fee: float = 0.0
+    wooden_packaging_required_fee: float = 0.0
+    insurance_required_fee: float = 0.0
+    item_count_check_required_fee: float = 0.0
 
 
 # Properties to receive via API on creation
@@ -52,9 +63,22 @@ class ShippingOrderInDBBase(ShippingOrderBase):
     height_packaged: float
     wide_packaged: float
     length_packaged: float
-    wood_packaged_fee: float
     created_at: datetime
     updated_at: datetime
+
+    contains_liquid: bool = False
+    is_fragile: bool = False
+    wooden_packaging_required: bool = False
+    insurance_required: bool = False
+    item_count_check_required: bool = False
+
+    image_path: str = None
+
+    contains_liquid_fee: float = 0.0
+    is_fragile_fee: float = 0.0
+    wooden_packaging_required_fee: float = 0.0
+    insurance_required_fee: float = 0.0
+    item_count_check_required_fee: float = 0.0
 
     class Config:
         from_attributes = True

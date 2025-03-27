@@ -1,8 +1,7 @@
 from datetime import datetime, UTC
 from uuid import uuid4
 
-from sqlalchemy import Column, UUID, ForeignKey, String, Integer, DateTime, Float
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, UUID, ForeignKey, String, Integer, DateTime, Float, Boolean
 
 from app.db.base_class import Base
 
@@ -32,13 +31,28 @@ class ShippingOrder(Base):
     wide_packaged = Column(Float(), nullable=False)
     length_packaged = Column(Float(), nullable=False)
 
-    wood_packaged_fee = Column(Float(), nullable=False)
-
     created_at = Column(DateTime, default=datetime.now(UTC))
     updated_at = Column(
         DateTime,
         default=datetime.now(UTC),
         onupdate=datetime.now(UTC),
     )
+
+    shipping_address = Column(String(2056), nullable=False)
+
+    contains_liquid = Column(Boolean(), nullable=False, default=False)
+    is_fragile = Column(Boolean(), nullable=False, default=False)
+    wooden_packaging_required = Column(Boolean(), nullable=False, default=False)
+    insurance_required = Column(Boolean(), nullable=False, default=False)
+    item_count_check_required = Column(Boolean(), nullable=False, default=False)
+
+    contains_liquid_fee = Column(Float(), nullable=False, default=0.0)
+    is_fragile_fee = Column(Float(), nullable=False, default=0.0)
+    wooden_packaging_required_fee = Column(Float(), nullable=False, default=0.0)
+    insurance_required_fee = Column(Float(), nullable=False, default=0.0)
+    item_count_check_required_fee = Column(Float(), nullable=False, default=0.0)
+
+    image_path = Column(String(255), nullable=True)
+
 
 

@@ -26,7 +26,16 @@ class CRUDShippingOrder(CRUDBase[ShippingOrder, ShippingOrderCreate, ShippingOrd
             height_packaged=obj_in.height_packaged,
             wide_packaged=obj_in.wide_packaged,
             length_packaged=obj_in.length_packaged,
-            wood_packaged_fee=obj_in.wood_packaged_fee
+            contains_liquid=obj_in.contains_liquid,
+            is_fragile=obj_in.is_fragile,
+            wooden_packaging_required=obj_in.wooden_packaging_required,
+            insurance_required=obj_in.insurance_required,
+            item_count_check_required=obj_in.item_count_check_required,
+            contains_liquid_fee=obj_in.contains_liquid_fee,
+            is_fragile_fee=obj_in.is_fragile_fee,
+            wooden_packaging_required_fee=obj_in.wooden_packaging_required_fee,
+            insurance_required_fee=obj_in.insurance_required_fee,
+            item_count_check_required_fee=obj_in.item_count_check_required_fee
         )
         db.add(db_obj)
         db.commit()

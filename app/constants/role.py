@@ -3,9 +3,9 @@ class Role:
     Constants for the various roles scoped in the application ecosystem
     """
 
-    GUEST = {
-        "name": "GUEST",
-        "description": "A Guest Account",
+    USER = {
+        "name": "USER",
+        "description": "A USER Account",
     }
     ACCOUNT_ADMIN = {
         "name": "ACCOUNT_ADMIN",
