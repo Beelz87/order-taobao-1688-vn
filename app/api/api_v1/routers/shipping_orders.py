@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from app import schemas, models, crud
 from app.api import deps
-from app.schemas import Role
+from app.constants.role import Role
 
 router = APIRouter(prefix="/shipping_orders", tags=["shipping_orders"])
 
@@ -18,7 +18,7 @@ def read_shipping_orders(
     limit: int = 100,
     current_user: models.User = Security(
         deps.get_current_active_user,
-        scopes=[Role.ADMIN["name"], Role.USER["name"]],
+        scopes=[Role.ADMIN["name"]],
     ),
 ) -> Any:
     """

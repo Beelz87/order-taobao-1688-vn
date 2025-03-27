@@ -12,7 +12,6 @@ class ShippingOrder(Base):
         UUID(as_uuid=True), primary_key=True, index=True, default=uuid4
     )
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"))
-    user = relationship("User", back_populates="orders")
 
     shipping_name = Column(String(255), nullable=False)
     shipping_phone_number = Column(String(13), nullable=False)

@@ -24,6 +24,8 @@ def upgrade():
         sa.Column("name", sa.String(length=255), nullable=False),
         sa.Column("description", sa.String(length=255), nullable=True),
         sa.Column("is_active", sa.Boolean(), nullable=True),
+        sa.Column("plan_id", postgresql.UUID(as_uuid=True), nullable=True),
+        sa.Column("current_subscription_ends", sa.DateTime(), nullable=True),
         sa.Column("created_at", sa.DateTime(), nullable=True),
         sa.Column("updated_at", sa.DateTime(), nullable=True),
         sa.PrimaryKeyConstraint("id"),
