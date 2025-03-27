@@ -15,7 +15,7 @@ from sqlalchemy.orm import Session
 reusable_oauth2 = OAuth2PasswordBearer(
     tokenUrl=f"{settings.API_V1_STR}/auth/access-token",
     scopes={
-        Role.GUEST["name"]: Role.GUEST["description"],
+        Role.USER["name"]: Role.USER["description"],
         Role.ACCOUNT_ADMIN["name"]: Role.ACCOUNT_ADMIN["description"],
         Role.ACCOUNT_MANAGER["name"]: Role.ACCOUNT_MANAGER["description"],
         Role.ADMIN["name"]: Role.ADMIN["description"],

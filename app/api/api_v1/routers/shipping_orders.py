@@ -1,3 +1,7 @@
+import base64
+import os
+import uuid
+from datetime import datetime, UTC
 from typing import List, Any
 
 from fastapi import APIRouter, Depends, Security, HTTPException
@@ -42,14 +46,49 @@ def create_shipping_order(
     shipping_order_in: schemas.ShippingOrderCreate,
     current_user: models.User = Security(
         deps.get_current_active_user,
-        scopes=[Role.ADMIN["name"], Role.SUPER_ADMIN["name"]],
+        scopes=[Role.ADMIN["name"], Role.SUPER_ADMIN["name"], Role.USER["name"]],
     ),
-) -> Any:
+):
     """
-    Create new shipping_order.
+    Create new shipping_order with optional image (base64).
     """
+    if current_user.user_role == Role.USER:
+        shipping_order_in.user_id = current_user.id
 
-    shipping_order = crud.shipping_order.create(db, obj_in=shipping_order_in)
+    image_filename = None
+
+    if shipping_order_in.image_base64:
+        # 1. Xử lý base64
+        try:
+            header, base64_data = shipping_order_in.image_base64.split(",", 1)
+        except ValueError:
+            base64_data = shipping_order_in.image_base64
+
+        image_data = base64.b64decode(base64_data)
+
+        # 2. Tạo thư mục lưu ảnh theo ngày
+        today = datetime.now(UTC)
+        upload_subdir = os.path.join(
+            "uploads",
+            str(today.year),
+            f"{today.month:02}",
+            f"{today.day:02}"
+        )
+        os.makedirs(upload_subdir, exist_ok=True)
+
+        # 3. Tạo file ảnh và lưu
+        image_filename = f"{uuid.uuid4()}.jpg"
+        image_path = os.path.join(upload_subdir, image_filename)
+
+        with open(image_path, "wb") as f:
+            f.write(image_data)
+
+    # 4. Lưu thông tin vào DB
+    shipping_order_data = shipping_order_in.model_dump()
+    if image_filename:
+        shipping_order_data["image_path"] = image_path  # full relative path
+
+    shipping_order = crud.shipping_order.create(db, obj_in=shipping_order_data)
     return shipping_order
 
 
