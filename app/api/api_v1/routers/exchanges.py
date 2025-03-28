@@ -6,10 +6,11 @@ from sqlalchemy.orm import Session
 from app import schemas, models, crud
 from app.api import deps
 from app.constants.role import Role
+from app.schemas.base.response import Response
 
 router = APIRouter(prefix="/exchanges", tags=["exchanges"])
 
-@router.get("", response_model=List[schemas.Exchange])
+@router.get("", response_model=Response[List[schemas.Exchange]])
 def read_exchanges(
     db: Session = Depends(deps.get_db),
     skip: int = 0,
@@ -23,9 +24,10 @@ def read_exchanges(
     Retrieve all exchanges.
     """
     exchanges = crud.exchange.get_multi(db, skip=skip, limit=limit,)
-    return exchanges
 
-@router.post("", response_model=schemas.Exchange)
+    return Response(message="", data=exchanges)
+
+@router.post("", response_model=Response[schemas.Exchange])
 def create_exchange(
     *,
     db: Session = Depends(deps.get_db),
@@ -46,10 +48,11 @@ def create_exchange(
             detail="The pair of exchange already exists in the system.",
         )
     exchange = crud.exchange.create(db, obj_in=exchange_in)
-    return exchange
+
+    return Response(message="", data=exchange)
 
 
-@router.patch("/{exchange_id}", response_model=schemas.Exchange)
+@router.patch("/{exchange_id}", response_model=Response[schemas.Exchange])
 def update_exchange(
     *,
     db: Session = Depends(deps.get_db),
@@ -70,4 +73,5 @@ def update_exchange(
             detail="The pair of exchange does not exist in the system.",
         )
     exchange = crud.exchange.update(db, obj_in=exchange_in)
-    return exchange
+
+    return Response(message="", data=exchange)

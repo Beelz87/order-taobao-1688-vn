@@ -11,11 +11,12 @@ from sqlalchemy.orm import Session
 from app import schemas, models, crud
 from app.api import deps
 from app.constants.role import Role
+from app.schemas.base.response import Response
 
-router = APIRouter(prefix="/shipping_orders", tags=["shipping-orders"])
+router = APIRouter(prefix="/shipping-orders", tags=["shipping-orders"])
 
 
-@router.get("", response_model=List[schemas.ShippingOrder])
+@router.get("", response_model=Response[List[schemas.ShippingOrder]])
 def read_shipping_orders(
     db: Session = Depends(deps.get_db),
     skip: int = 0,
@@ -36,10 +37,10 @@ def read_shipping_orders(
         shipping_orders = crud.shipping_order.get_multi_by_user(
             db, user_id=current_user.id, skip=skip, limit=limit)
 
-    return shipping_orders
+    return Response(message="", data=shipping_orders)
 
 
-@router.post("", response_model=schemas.ShippingOrder)
+@router.post("", response_model=Response[schemas.ShippingOrder])
 def create_shipping_order(
     *,
     db: Session = Depends(deps.get_db),
@@ -90,10 +91,11 @@ def create_shipping_order(
         shipping_order_data["image_path"] = image_path  # full relative path
 
     shipping_order = crud.shipping_order.create(db, obj_in=shipping_order_data)
-    return shipping_order
+
+    return Response(message="", data=shipping_order)
 
 
-@router.put("/{shipping_order_id}", response_model=schemas.ShippingOrder)
+@router.put("/{shipping_order_id}", response_model=Response[schemas.ShippingOrder])
 def update_shipping_order(
     *,
     db: Session = Depends(deps.get_db),
@@ -121,4 +123,5 @@ def update_shipping_order(
         )
 
     shipping_order = crud.shipping_order.update(db, obj_in=store_in)
-    return shipping_order
+
+    return Response(message="", data=shipping_order)

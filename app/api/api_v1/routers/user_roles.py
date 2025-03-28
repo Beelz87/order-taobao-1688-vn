@@ -7,10 +7,12 @@ from fastapi import APIRouter, Depends, HTTPException, Security
 from pydantic.types import UUID4
 from sqlalchemy.orm import Session
 
+from app.schemas.base.response import Response
+
 router = APIRouter(prefix="/user-roles", tags=["user-roles"])
 
 
-@router.post("", response_model=schemas.UserRole)
+@router.post("", response_model=Response[schemas.UserRole])
 def assign_user_role(
     *,
     db: Session = Depends(deps.get_db),
@@ -27,10 +29,11 @@ def assign_user_role(
             detail="This user has already been assigned a role.",
         )
     user_role = crud.user_role.create(db, obj_in=user_role_in)
-    return user_role
+
+    return Response(message="", data=user_role)
 
 
-@router.put("/{user_id}", response_model=schemas.UserRole)
+@router.put("/{user_id}", response_model=Response[schemas.UserRole])
 def update_user_role(
     *,
     db: Session = Depends(deps.get_db),
@@ -56,4 +59,5 @@ def update_user_role(
     user_role = crud.user_role.update(
         db, db_obj=user_role, obj_in=user_role_in
     )
-    return user_role
+
+    return Response(message="", data=user_role)

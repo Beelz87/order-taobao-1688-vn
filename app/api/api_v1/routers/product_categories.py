@@ -7,10 +7,11 @@ from sqlalchemy.orm import Session
 from app import schemas, models, crud
 from app.api import deps
 from app.constants.role import Role
+from app.schemas.base.response import Response
 
 router = APIRouter(prefix="/product-categories", tags=["product-categories"])
 
-@router.get("", response_model=List[schemas.ProductCategory])
+@router.get("", response_model=Response[List[schemas.ProductCategory]])
 def read_product_categories(
     db: Session = Depends(deps.get_db),
     skip: int = 0,
@@ -24,9 +25,10 @@ def read_product_categories(
     Retrieve all product categories.
     """
     product_categories = crud.product_category.get_multi(db, skip=skip, limit=limit)
-    return product_categories
 
-@router.post("", response_model=schemas.ProductCategory)
+    return Response(message="", data=product_categories)
+
+@router.post("", response_model=Response[schemas.ProductCategory])
 def create_product_category(
     *,
     db: Session = Depends(deps.get_db),
@@ -40,9 +42,10 @@ def create_product_category(
     Create new product category.
     """
     product_category = crud.product_category.create(db, obj_in=product_category_in)
-    return product_category
 
-@router.put("/{product_category_id}", response_model=schemas.ProductCategory)
+    return Response(message="", data=product_category)
+
+@router.put("/{product_category_id}", response_model=Response[schemas.ProductCategory])
 def update_product_category(
     *,
     db: Session = Depends(deps.get_db),
@@ -63,4 +66,5 @@ def update_product_category(
             detail="The product category does not exist in the system.",
         )
     product_category = crud.product_category.update(db, db_obj=product_category, obj_in=product_category_in)
-    return product_category
+
+    return Response(message="", data=product_category)

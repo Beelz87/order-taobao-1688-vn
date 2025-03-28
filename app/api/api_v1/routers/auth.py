@@ -49,19 +49,19 @@ def login_access_token(
     }
 
 
-@router.post("/test-token", response_model=schemas.User)
-def test_token(
-    current_user: models.User = Depends(deps.get_current_user),
-) -> Any:
-    """
-    Test access token
-    """
-    return current_user
+# @router.post("/test-token", response_model=schemas.User)
+# def test_token(
+#     current_user: models.User = Depends(deps.get_current_user),
+# ) -> Any:
+#     """
+#     Test access token
+#     """
+#     return current_user
 
 
-@router.post("/hash-password", response_model=str)
-def hash_password(password: str = Body(..., embed=True),) -> Any:
-    """
-    Hash a password
-    """
-    return security.get_password_hash(password)
+# @router.post("/hash-password", response_model=str)
+# def hash_password(password: str = Body(..., embed=True),) -> Any:
+#     """
+#     Hash a password
+#     """
+#     return security.get_password_hash(password)
