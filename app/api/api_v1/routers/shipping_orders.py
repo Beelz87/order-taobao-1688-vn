@@ -12,7 +12,7 @@ from app import schemas, models, crud
 from app.api import deps
 from app.constants.role import Role
 
-router = APIRouter(prefix="/shipping_orders", tags=["shipping_orders"])
+router = APIRouter(prefix="/shipping_orders", tags=["shipping-orders"])
 
 
 @router.get("", response_model=List[schemas.ShippingOrder])
@@ -22,7 +22,7 @@ def read_shipping_orders(
     limit: int = 100,
     current_user: models.User = Security(
         deps.get_current_active_user,
-        scopes=[Role.ADMIN["name"]],
+        scopes=[Role.ADMIN["name"], Role.SUPER_ADMIN["name"], Role.USER["name"]],
     ),
 ) -> Any:
     """
@@ -101,7 +101,7 @@ def update_shipping_order(
     store_in: schemas.StoreUpdate,
     current_user: models.User = Security(
         deps.get_current_active_user,
-        scopes=[Role.SUPER_ADMIN["name"]],
+        scopes=[Role.ADMIN["name"], Role.SUPER_ADMIN["name"], Role.USER["name"]],
     ),
 ) -> Any:
     """
