@@ -7,6 +7,7 @@ from app.db.base_class import Base
 
 
 class ProductCategory(Base):
+    __tablename__ = "product_categories"
     id = Column(
         UUID(as_uuid=True), primary_key=True, index=True, default=uuid4
     )

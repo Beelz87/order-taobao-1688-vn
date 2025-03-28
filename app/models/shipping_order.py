@@ -7,6 +7,8 @@ from app.db.base_class import Base
 
 
 class ShippingOrder(Base):
+    __tablename__ = "shipping_orders"
+
     id = Column(
         UUID(as_uuid=True), primary_key=True, index=True, default=uuid4
     )
