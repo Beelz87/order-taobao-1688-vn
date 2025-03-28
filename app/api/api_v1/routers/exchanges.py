@@ -16,7 +16,7 @@ def read_exchanges(
     limit: int = 100,
     current_user: models.User = Security(
         deps.get_current_active_user,
-        scopes=[Role.ADMIN["name"], Role.SUPER_ADMIN["name"]],
+        scopes=[Role.ADMIN["name"], Role.SUPER_ADMIN["name"], Role.USER["name"]],
     ),
 ) -> Any:
     """
