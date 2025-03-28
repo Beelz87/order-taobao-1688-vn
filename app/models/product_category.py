@@ -1,4 +1,3 @@
-from tkinter import Text
 from uuid import uuid4
 
 from sqlalchemy import Column, UUID, String, Integer, Boolean
