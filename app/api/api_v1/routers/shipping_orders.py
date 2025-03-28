@@ -70,6 +70,7 @@ def create_shipping_order(
         today = datetime.now(UTC)
         upload_subdir = os.path.join(
             "uploads",
+            "shipping_orders",
             str(today.year),
             f"{today.month:02}",
             f"{today.day:02}"
