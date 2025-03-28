@@ -10,10 +10,12 @@ from pydantic.networks import EmailStr
 from pydantic.types import UUID4
 from sqlalchemy.orm import Session
 
+from app.schemas.base.response import Response
+
 router = APIRouter(prefix="/users", tags=["users"])
 
 
-@router.get("", response_model=List[schemas.User])
+@router.get("", response_model=Response[List[schemas.User]])
 def read_users(
     db: Session = Depends(deps.get_db),
     skip: int = 0,
@@ -27,10 +29,11 @@ def read_users(
     Retrieve all users.
     """
     users = crud.user.get_multi(db, skip=skip, limit=limit,)
-    return users
+
+    return Response(message="", data=users)
 
 
-@router.post("", response_model=schemas.User)
+@router.post("", response_model=Response[schemas.User])
 def create_user(
     *,
     db: Session = Depends(deps.get_db),
@@ -50,10 +53,10 @@ def create_user(
             detail="The user with this username already exists in the system.",
         )
     user = crud.user.create(db, obj_in=user_in)
-    return user
+    return Response(message="", data=user)
 
 
-@router.put("/me", response_model=schemas.User)
+@router.put("/me", response_model=Response[schemas.User])
 def update_user_me(
     *,
     db: Session = Depends(deps.get_db),
@@ -74,10 +77,11 @@ def update_user_me(
     if email is not None:
         user_in.email = email
     user = crud.user.update(db, db_obj=current_user, obj_in=user_in)
-    return user
+
+    return Response(message="", data=user)
 
 
-@router.get("/me", response_model=schemas.User)
+@router.get("/me", response_model=Response[schemas.User])
 def read_user_me(
     db: Session = Depends(deps.get_db),
     current_user: models.User = Depends(deps.get_current_active_user),
@@ -88,7 +92,8 @@ def read_user_me(
     if not current_user.user_role:
         role = None
     else:
-        role = current_user.user_role.role.name
+        role = current_user.user_role
+
     user_data = schemas.User(
         id=current_user.id,
         email=current_user.email,
@@ -96,12 +101,13 @@ def read_user_me(
         full_name=current_user.full_name,
         created_at=current_user.created_at,
         updated_at=current_user.updated_at,
-        role=role,
+        user_role=role
     )
-    return user_data
+
+    return Response(message="", data=user_data)
 
 
-@router.post("/open", response_model=schemas.User)
+@router.post("/open", response_model=Response[schemas.User])
 def create_user_open(
     *,
     db: Session = Depends(deps.get_db),
@@ -131,10 +137,11 @@ def create_user_open(
         phone_number=phone_number,
     )
     user = crud.user.create(db, obj_in=user_in)
-    return user
+
+    return Response(message="", data=user)
 
 
-@router.get("/{user_id}", response_model=schemas.User)
+@router.get("/{user_id}", response_model=Response[schemas.User])
 def read_user_by_id(
     user_id: UUID4,
     current_user: models.User = Security(
@@ -147,10 +154,11 @@ def read_user_by_id(
     Get a specific user by id.
     """
     user = crud.user.get(db, id=user_id)
-    return user
+
+    return Response(message="", data=user)
 
 
-@router.put("/{user_id}", response_model=schemas.User)
+@router.put("/{user_id}", response_model=Response[schemas.User])
 def update_user(
     *,
     db: Session = Depends(deps.get_db),
@@ -171,4 +179,5 @@ def update_user(
             detail="The user with this username does not exist in the system",
         )
     user = crud.user.update(db, db_obj=user, obj_in=user_in)
-    return user
+
+    return Response(message="", data=user)

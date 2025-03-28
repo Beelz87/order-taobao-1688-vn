@@ -7,10 +7,11 @@ from sqlalchemy.orm import Session
 from app import schemas, models, crud
 from app.api import deps
 from app.constants.role import Role
+from app.schemas.base.response import Response
 
 router = APIRouter(prefix="/stores", tags=["stores"])
 
-@router.get("", response_model=List[schemas.Store])
+@router.get("", response_model=Response[List[schemas.Store]])
 def read_stores(
     db: Session = Depends(deps.get_db),
     skip: int = 0,
@@ -24,9 +25,10 @@ def read_stores(
     Retrieve all stores.
     """
     stores = crud.store.get_multi(db, skip=skip, limit=limit,)
-    return stores
 
-@router.post("", response_model=schemas.Store)
+    return Response(message="", data=stores)
+
+@router.post("", response_model=Response[schemas.Store])
 def create_store(
     *,
     db: Session = Depends(deps.get_db),
@@ -40,10 +42,11 @@ def create_store(
     Create new store.
     """
     store = crud.store.create(db, obj_in=store_in)
-    return store
+
+    return Response(message="", data=store)
 
 
-@router.put("/{store_id}", response_model=schemas.Store)
+@router.put("/{store_id}", response_model=Response[schemas.Store])
 def update_store(
     *,
     db: Session = Depends(deps.get_db),
@@ -64,4 +67,5 @@ def update_store(
             detail="The store does not exist in the system.",
         )
     store = crud.store.update(db, obj_in=store_in)
-    return store
+
+    return Response(message="", data=store)

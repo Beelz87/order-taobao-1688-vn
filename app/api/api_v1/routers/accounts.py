@@ -7,10 +7,12 @@ from fastapi import APIRouter, Body, Depends, HTTPException, Security
 from pydantic.types import UUID4
 from sqlalchemy.orm import Session
 
+from app.schemas.base.response import Response
+
 router = APIRouter(prefix="/accounts", tags=["accounts"])
 
 
-@router.get("", response_model=List[schemas.Account])
+@router.get("", response_model=Response[List[schemas.Account]])
 def get_accounts(
     *,
     db: Session = Depends(deps.get_db),
@@ -25,10 +27,11 @@ def get_accounts(
     Retrieve all accounts.
     """
     accounts = crud.account.get_multi(db, skip=skip, limit=limit)
-    return accounts
+
+    return Response(message="", data=accounts)
 
 
-@router.get("/me", response_model=schemas.Account)
+@router.get("/me", response_model=Response[schemas.Account])
 def get_account_for_user(
     *,
     db: Session = Depends(deps.get_db),
@@ -40,10 +43,11 @@ def get_account_for_user(
     Retrieve account for a logged in user.
     """
     account = crud.account.get(db, id=current_user.account_id)
-    return account
+
+    return Response(message="", data=account)
 
 
-@router.post("", response_model=schemas.Account)
+@router.post("", response_model=Response[schemas.Account])
 def create_account(
     *,
     db: Session = Depends(deps.get_db),
@@ -59,10 +63,11 @@ def create_account(
             status_code=409, detail="An account with this name already exists",
         )
     account = crud.account.create(db, obj_in=account_in)
-    return account
+
+    return Response(message="", data=account)
 
 
-@router.put("/{account_id}", response_model=schemas.Account)
+@router.put("/{account_id}", response_model=Response[schemas.Account])
 def update_account(
     *,
     db: Session = Depends(deps.get_db),
@@ -97,10 +102,11 @@ def update_account(
             status_code=404, detail="Account does not exist",
         )
     account = crud.account.update(db, db_obj=account, obj_in=account_in)
-    return account
+
+    return Response(message="", data=account)
 
 
-@router.post("/{account_id}/users", response_model=schemas.User)
+@router.post("/{account_id}/users", response_model=Response[schemas.User])
 def add_user_to_account(
     *,
     db: Session = Depends(deps.get_db),
@@ -123,10 +129,11 @@ def add_user_to_account(
         )
     user_in = schemas.UserUpdate(account_id=account_id)
     updated_user = crud.user.update(db, db_obj=user, obj_in=user_in)
-    return updated_user
+
+    return Response(message="", data=updated_user)
 
 
-@router.get("/{account_id}/users", response_model=List[schemas.User])
+@router.get("/{account_id}/users", response_model=Response[List[schemas.User]])
 def retrieve_users_for_account(
     *,
     db: Session = Depends(deps.get_db),
@@ -149,10 +156,11 @@ def retrieve_users_for_account(
     account_users = crud.user.get_by_account_id(
         db, account_id=account_id, skip=skip, limit=limit
     )
-    return account_users
+
+    return Response(message="", data=account_users)
 
 
-@router.get("/users/me", response_model=List[schemas.Account])
+@router.get("/users/me", response_model=Response[List[schemas.Account]])
 def retrieve_users_for_own_account(
     *,
     db: Session = Depends(deps.get_db),
@@ -178,4 +186,5 @@ def retrieve_users_for_own_account(
     account_users = crud.user.get_by_account_id(
         db, account_id=account.id, skip=skip, limit=limit
     )
-    return account_users
+
+    return Response(message="", data=account_users)
