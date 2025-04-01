@@ -1,9 +1,10 @@
 from typing import Any, Dict, Generic, List, Optional, Type, TypeVar, Union
 
-from app.db.base import Base
 from fastapi.encoders import jsonable_encoder
-from pydantic import UUID4, BaseModel
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
+
+from app.db.base import Base
 
 # Define custom types for SQLAlchemy model, and Pydantic schemas
 ModelType = TypeVar("ModelType", bound=Base)
@@ -26,7 +27,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     ) -> List[ModelType]:
         return db.query(self.model).offset(skip).limit(limit).all()
 
-    def get(self, db: Session, id: UUID4) -> Optional[ModelType]:
+    def get(self, db: Session, id: int) -> Optional[ModelType]:
         return db.query(self.model).filter(self.model.id == id).first()
 
     def create(self, db: Session, *, obj_in: CreateSchemaType) -> ModelType:
@@ -48,7 +49,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         if isinstance(obj_in, dict):
             update_data = obj_in
         else:
-            update_data = obj_in.dict(exclude_unset=True)
+            update_data = obj_in.model_dump(exclude_unset=True)
         for field in obj_data:
             if field in update_data:
                 setattr(db_obj, field, update_data[field])
@@ -57,7 +58,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         db.refresh(db_obj)
         return db_obj
 
-    def remove(self, db: Session, *, id: UUID4) -> ModelType:
+    def remove(self, db: Session, *, id: int) -> ModelType:
         obj = db.query(self.model).get(id)
         db.delete(obj)
         db.commit()

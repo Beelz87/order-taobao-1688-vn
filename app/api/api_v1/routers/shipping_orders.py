@@ -5,7 +5,6 @@ from datetime import datetime, UTC
 from typing import List, Any
 
 from fastapi import APIRouter, Depends, Security, HTTPException
-from pydantic import UUID4
 from sqlalchemy.orm import Session
 
 from app import schemas, models, crud
@@ -21,21 +20,34 @@ def read_shipping_orders(
     db: Session = Depends(deps.get_db),
     skip: int = 0,
     limit: int = 100,
+    id: int = None,
+    code: str = None,
+    store_id: int = None,
+    created_at: datetime = None,
     current_user: models.User = Security(
         deps.get_current_active_user,
         scopes=[Role.ADMIN["name"], Role.SUPER_ADMIN["name"], Role.USER["name"]],
     ),
 ) -> Any:
     """
-    Retrieve all shipping_orders.
+    Retrieve all shipping_orders with optional filters.
     """
+    filters = {}
+    if id is not None:
+        filters["id"] = id
+    if code is not None:
+        filters["code"] = code
+    if store_id is not None:
+        filters["store_id"] = store_id
+    if created_at is not None:
+        filters["created_at"] = created_at
 
     shipping_orders = []
     if current_user.user_role == Role.ADMIN:
-        shipping_orders = crud.shipping_order.get_multi(db, skip=skip, limit=limit)
+        shipping_orders = crud.shipping_order.get_multi(db, skip=skip, limit=limit, filters=filters)
     elif current_user.user_role == Role.USER:
-        shipping_orders = crud.shipping_order.get_multi_by_user(
-            db, user_id=current_user.id, skip=skip, limit=limit)
+        filters["user_id"] = current_user.id
+        shipping_orders = crud.shipping_order.get_multi(db, skip=skip, limit=limit, filters=filters)
 
     return Response(message="", data=shipping_orders)
 
@@ -99,7 +111,7 @@ def create_shipping_order(
 def update_shipping_order(
     *,
     db: Session = Depends(deps.get_db),
-    shipping_order_id: UUID4,
+    shipping_order_id: int,
     store_in: schemas.StoreUpdate,
     current_user: models.User = Security(
         deps.get_current_active_user,

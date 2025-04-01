@@ -1,8 +1,7 @@
 from datetime import datetime, UTC
-from uuid import uuid4
 
 from app.db.base_class import Base
-from sqlalchemy import Boolean, Column, DateTime, String
+from sqlalchemy import Boolean, Column, DateTime, String, Integer
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
@@ -12,9 +11,7 @@ class Account(Base):
     Database model for an account
     """
 
-    id = Column(
-        UUID(as_uuid=True), primary_key=True, index=True, default=uuid4
-    )
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     name = Column(String(255), index=True, nullable=False)
     description = Column(String(255))
     is_active = Column(Boolean(), default=True)

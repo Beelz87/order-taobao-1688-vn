@@ -15,14 +15,10 @@ class ExchangeCreate(ExchangeBase):
     pass
 
 class ExchangeUpdate(BaseModel):
-    foreign_currency: str
-    local_currency: str
-    is_active: bool
-    rate: float
-    type: int
+    pass
 
 class ExchangeInDBBase(ExchangeBase):
-    id: str
+    id: int
 
     class Config:
         from_attributes = True

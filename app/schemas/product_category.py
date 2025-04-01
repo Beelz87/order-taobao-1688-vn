@@ -1,11 +1,12 @@
 from typing import Optional
 
-from pydantic import UUID4, BaseModel
+from pydantic import BaseModel
+
 
 class ProductCategoryBase(BaseModel):
     name: Optional[str]
     description: Optional[str]
-    category_parent_id: Optional[UUID4]
+    category_parent_id: Optional[int]
     level: Optional[int]
     is_active: Optional[bool]
 
@@ -19,7 +20,7 @@ class ProductCategoryUpdate(ProductCategoryBase):
 
 
 class ProductCategoryInDBBase(ProductCategoryBase):
-    id: UUID4
+    id: int
 
     class Config:
         from_attributes = True

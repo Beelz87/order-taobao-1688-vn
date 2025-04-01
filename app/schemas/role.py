@@ -1,6 +1,6 @@
 from typing import Optional
 
-from pydantic import UUID4, BaseModel
+from pydantic import BaseModel
 
 
 # Shared properties
@@ -20,7 +20,7 @@ class RoleUpdate(RoleBase):
 
 
 class RoleInDBBase(RoleBase):
-    id: UUID4
+    id: int
 
     class Config:
         from_attributes = True

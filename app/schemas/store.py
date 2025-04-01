@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel, UUID4
+from pydantic import BaseModel
 
 
 class StoreBase(BaseModel):
@@ -22,7 +22,7 @@ class StoreUpdate(StoreBase):
 
 
 class StoreInDBBase(StoreBase):
-    id: UUID4
+    id: int
     name: str
     description: str
     is_active: bool

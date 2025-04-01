@@ -1,7 +1,6 @@
 from typing import Any, List
 
 from fastapi import APIRouter, Depends, Security, HTTPException
-from pydantic import UUID4
 from sqlalchemy.orm import Session
 
 from app import schemas, models, crud
@@ -49,7 +48,7 @@ def create_product_category(
 def update_product_category(
     *,
     db: Session = Depends(deps.get_db),
-    product_category_id: UUID4,
+    product_category_id: int,
     product_category_in: schemas.ProductCategoryUpdate,
     current_user: models.User = Security(
         deps.get_current_active_user,

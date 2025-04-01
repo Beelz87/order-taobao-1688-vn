@@ -1,12 +1,11 @@
 from typing import Any
 
+from fastapi import APIRouter, Depends, HTTPException, Security
+from sqlalchemy.orm import Session
+
 from app import crud, models, schemas
 from app.api import deps
 from app.constants.role import Role
-from fastapi import APIRouter, Depends, HTTPException, Security
-from pydantic.types import UUID4
-from sqlalchemy.orm import Session
-
 from app.schemas.base.response import Response
 
 router = APIRouter(prefix="/user-roles", tags=["user-roles"])
@@ -37,7 +36,7 @@ def assign_user_role(
 def update_user_role(
     *,
     db: Session = Depends(deps.get_db),
-    user_id: UUID4,
+    user_id: int,
     user_role_in: schemas.UserRoleUpdate,
     current_user: models.User = Security(
         deps.get_current_active_user,

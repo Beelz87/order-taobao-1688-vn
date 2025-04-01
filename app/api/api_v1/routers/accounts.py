@@ -1,12 +1,11 @@
 from typing import Any, List
 
+from fastapi import APIRouter, Body, Depends, HTTPException, Security
+from sqlalchemy.orm import Session
+
 from app import crud, models, schemas
 from app.api import deps
 from app.constants.role import Role
-from fastapi import APIRouter, Body, Depends, HTTPException, Security
-from pydantic.types import UUID4
-from sqlalchemy.orm import Session
-
 from app.schemas.base.response import Response
 
 router = APIRouter(prefix="/accounts", tags=["accounts"])
@@ -71,7 +70,7 @@ def create_account(
 def update_account(
     *,
     db: Session = Depends(deps.get_db),
-    account_id: UUID4,
+    account_id: int,
     account_in: schemas.AccountUpdate,
     current_user: models.User = Security(
         deps.get_current_active_user,
@@ -110,7 +109,7 @@ def update_account(
 def add_user_to_account(
     *,
     db: Session = Depends(deps.get_db),
-    account_id: UUID4,
+    account_id: int,
     user_id: str = Body(..., embed=True),
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
@@ -139,7 +138,7 @@ def retrieve_users_for_account(
     db: Session = Depends(deps.get_db),
     skip: int = 0,
     limit: int = 100,
-    account_id: UUID4,
+    account_id: int,
     current_user: models.User = Security(
         deps.get_current_active_user,
         scopes=[Role.ADMIN["name"], Role.SUPER_ADMIN["name"]],
