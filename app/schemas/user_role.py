@@ -1,13 +1,14 @@
 from typing import Optional
 
+from pydantic import BaseModel
+
 from app.schemas.role import Role
-from pydantic import UUID4, BaseModel
 
 
 # Shared properties
 class UserRoleBase(BaseModel):
-    user_id: Optional[UUID4]
-    role_id: Optional[UUID4]
+    user_id: Optional[int]
+    role_id: Optional[int]
 
 
 # Properties to receive via API on creation
@@ -17,7 +18,7 @@ class UserRoleCreate(UserRoleBase):
 
 # Properties to receive via API on update
 class UserRoleUpdate(BaseModel):
-    role_id: UUID4
+    role_id: int
 
 
 class UserRoleInDBBase(UserRoleBase):

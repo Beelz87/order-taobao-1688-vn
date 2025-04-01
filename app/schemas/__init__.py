@@ -8,3 +8,4 @@ from .exchange import Exchange, ExchangeCreate, ExchangeInDB, ExchangeUpdate
 from .store import Store, StoreCreate, StoreInDB, StoreUpdate
 from .shipping_order import ShippingOrder, ShippingOrderCreate, ShippingOrderInDB, ShippingOrderUpdate
 from .product_category import ProductCategory, ProductCategoryCreate, ProductCategoryInDB, ProductCategoryUpdate
+from .deposit_bill import DepositBill, DepositBillCreate, DepositBillInDB, DepositBillUpdate

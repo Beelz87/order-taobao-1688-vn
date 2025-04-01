@@ -1,8 +1,9 @@
 from datetime import datetime
 from typing import Optional
 
+from pydantic import BaseModel, EmailStr
+
 from app.schemas.user_role import UserRole
-from pydantic import UUID4, BaseModel, EmailStr
 
 
 # Shared properties
@@ -11,7 +12,7 @@ class UserBase(BaseModel):
     is_active: Optional[bool] = True
     full_name: Optional[str] = None
     phone_number: Optional[str] = None
-    account_id: Optional[UUID4] = None
+    account_id: Optional[int] = None
 
 
 # Properties to receive via API on creation
@@ -25,7 +26,7 @@ class UserUpdate(UserBase):
 
 
 class UserInDBBase(UserBase):
-    id: UUID4
+    id: int
     user_role: Optional[UserRole]
     created_at: datetime
     updated_at: datetime

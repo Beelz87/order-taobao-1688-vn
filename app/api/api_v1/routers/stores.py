@@ -1,7 +1,6 @@
 from typing import Any, List
 
 from fastapi import APIRouter, Depends, Security, HTTPException
-from pydantic import UUID4
 from sqlalchemy.orm import Session
 
 from app import schemas, models, crud
@@ -50,7 +49,7 @@ def create_store(
 def update_store(
     *,
     db: Session = Depends(deps.get_db),
-    store_id: UUID4,
+    store_id: int,
     store_in: schemas.StoreUpdate,
     current_user: models.User = Security(
         deps.get_current_active_user,

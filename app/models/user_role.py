@@ -1,19 +1,19 @@
-from app.db.base_class import Base
-from sqlalchemy import Column, ForeignKey, UniqueConstraint
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import Column, ForeignKey, UniqueConstraint, Integer
 from sqlalchemy.orm import relationship
+
+from app.db.base_class import Base
 
 
 class UserRole(Base):
     __tablename__ = "user_roles"
     user_id = Column(
-        UUID(as_uuid=True),
+        Integer,
         ForeignKey("users.id"),
         primary_key=True,
         nullable=False,
     )
     role_id = Column(
-        UUID(as_uuid=True),
+        Integer,
         ForeignKey("roles.id"),
         primary_key=True,
         nullable=False,

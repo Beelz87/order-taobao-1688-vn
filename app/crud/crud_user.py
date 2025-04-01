@@ -1,11 +1,11 @@
 from typing import Any, Dict, List, Optional, Union
 
+from sqlalchemy.orm import Session
+
 from app.core.security import get_password_hash, verify_password
 from app.crud.base import CRUDBase
 from app.models.user import User
 from app.schemas.user import UserCreate, UserUpdate
-from pydantic.types import UUID4
-from sqlalchemy.orm import Session
 
 
 class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
@@ -63,7 +63,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         self,
         db: Session,
         *,
-        account_id: UUID4,
+        account_id: int,
         skip: int = 0,
         limit: int = 100,
     ) -> List[User]:

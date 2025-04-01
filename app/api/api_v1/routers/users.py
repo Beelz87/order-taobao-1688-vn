@@ -1,15 +1,14 @@
 from typing import Any, List
 
+from fastapi import APIRouter, Body, Depends, HTTPException, Security
+from fastapi.encoders import jsonable_encoder
+from pydantic.networks import EmailStr
+from sqlalchemy.orm import Session
+
 from app import crud, models, schemas
 from app.api import deps
 from app.constants.role import Role
 from app.core.config import settings
-from fastapi import APIRouter, Body, Depends, HTTPException, Security
-from fastapi.encoders import jsonable_encoder
-from pydantic.networks import EmailStr
-from pydantic.types import UUID4
-from sqlalchemy.orm import Session
-
 from app.schemas.base.response import Response
 
 router = APIRouter(prefix="/users", tags=["users"])
@@ -143,7 +142,7 @@ def create_user_open(
 
 @router.get("/{user_id}", response_model=Response[schemas.User])
 def read_user_by_id(
-    user_id: UUID4,
+    user_id: int,
     current_user: models.User = Security(
         deps.get_current_active_user,
         scopes=[Role.ADMIN["name"], Role.SUPER_ADMIN["name"]],
@@ -162,7 +161,7 @@ def read_user_by_id(
 def update_user(
     *,
     db: Session = Depends(deps.get_db),
-    user_id: UUID4,
+    user_id: int,
     user_in: schemas.UserUpdate,
     current_user: models.User = Security(
         deps.get_current_active_user,

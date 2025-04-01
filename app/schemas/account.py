@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
-from pydantic import UUID4, BaseModel
+from pydantic import BaseModel
 
 
 # Shared properties
@@ -9,7 +9,7 @@ class AccountBase(BaseModel):
     name: Optional[str]
     description: Optional[str]
     current_subscription_ends: Optional[datetime] = None
-    plan_id: Optional[UUID4] = None
+    plan_id: Optional[int] = None
     is_active: Optional[bool] = True
 
 
@@ -24,7 +24,7 @@ class AccountUpdate(AccountBase):
 
 
 class AccountInDBBase(AccountBase):
-    id: UUID4
+    id: int
     created_at: datetime
     updated_at: datetime
 

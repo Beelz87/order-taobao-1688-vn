@@ -1,7 +1,7 @@
 from datetime import datetime, UTC
-from uuid import uuid4
 
 from sqlalchemy import Column, UUID, ForeignKey, String, Integer, DateTime, Float, Boolean
+from sqlalchemy.orm import relationship
 
 from app.db.base_class import Base
 
@@ -9,16 +9,18 @@ from app.db.base_class import Base
 class ShippingOrder(Base):
     __tablename__ = "shipping_orders"
 
-    id = Column(
-        UUID(as_uuid=True), primary_key=True, index=True, default=uuid4
-    )
-    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"))
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+
+    user_id = Column(Integer(), ForeignKey("users.id"), nullable=False)
+    user = relationship("User", back_populates="shipping_orders")
 
     shipping_name = Column(String(255), nullable=False)
     shipping_phone_number = Column(String(13), nullable=False)
 
-    send_store_id = Column(UUID(as_uuid=True), ForeignKey("stores.id"))
-    receive_store_id = Column(UUID(as_uuid=True), ForeignKey("stores.id"))
+    store_id = Column(
+        Integer(), ForeignKey("stores.id"), index=True, nullable=False
+    )
+    store = relationship("Store", back_populates="shipping_orders")
 
     shipping_status = Column(Integer(), nullable=False)
     store_status = Column(Integer(), nullable=False)
@@ -33,7 +35,7 @@ class ShippingOrder(Base):
     wide_packaged = Column(Float(), nullable=False)
     length_packaged = Column(Float(), nullable=False)
 
-    created_at = Column(DateTime, default=datetime.now(UTC))
+    created_at = Column(DateTime, index=True, default=datetime.now(UTC))
     updated_at = Column(
         DateTime,
         default=datetime.now(UTC),
@@ -56,5 +58,12 @@ class ShippingOrder(Base):
 
     image_path = Column(String(255), nullable=True)
 
+    product_category_id = Column(
+        Integer(), ForeignKey("product_categories.id"), nullable=False
+    )
+    product_category = relationship("ProductCategory", back_populates="shipping_orders")
 
+    number_of_packages = Column(Integer(), nullable=False, default=1)
+    domestic_shipping_fee = Column(Float(), nullable=False, default=0.0)
+    code = Column(UUID(), nullable=False, index=True)
 
