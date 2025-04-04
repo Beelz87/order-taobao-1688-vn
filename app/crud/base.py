@@ -63,3 +63,21 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         db.delete(obj)
         db.commit()
         return obj
+
+
+    def remove_multi(self, db: Session, *, ids: List[int]) -> List[ModelType]:
+        """
+        Remove multiple objects from the database by their IDs.
+
+        :param db: The database session
+        :type db: Session
+        :param ids: List of IDs of the objects to remove
+        :type ids: List[int]
+        :return: List of removed objects
+        :rtype: List[ModelType]
+        """
+        objects = db.query(self.model).filter(self.model.id.in_(ids)).all()
+        for obj in objects:
+            db.delete(obj)
+        db.commit()
+        return objects

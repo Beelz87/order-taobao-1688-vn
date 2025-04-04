@@ -1,8 +1,8 @@
 """init
 
-Revision ID: 2bf4b454ee5f
+Revision ID: 58c108ae0077
 Revises: 
-Create Date: 2025-03-31 23:47:08.141076
+Create Date: 2025-04-04 19:03:43.703113
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '2bf4b454ee5f'
+revision = '58c108ae0077'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -91,20 +91,7 @@ def upgrade():
     op.create_index(op.f('ix_users_full_name'), 'users', ['full_name'], unique=False)
     op.create_index(op.f('ix_users_id'), 'users', ['id'], unique=False)
     op.create_index(op.f('ix_users_phone_number'), 'users', ['phone_number'], unique=True)
-    op.create_table('deposit_bills',
-    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
-    sa.Column('user_id', sa.Integer(), nullable=True),
-    sa.Column('user_fullname', sa.String(length=255), nullable=True),
-    sa.Column('amount', sa.Float(), nullable=True),
-    sa.Column('deposit_type', sa.Integer(), nullable=True),
-    sa.Column('note', sa.Text(), nullable=True),
-    sa.Column('created_at', sa.DateTime(), nullable=True),
-    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_index(op.f('ix_deposit_bills_created_at'), 'deposit_bills', ['created_at'], unique=False)
-    op.create_index(op.f('ix_deposit_bills_id'), 'deposit_bills', ['id'], unique=False)
-    op.create_table('shipping_orders',
+    op.create_table('consignments',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('shipping_name', sa.String(length=255), nullable=False),
@@ -143,10 +130,23 @@ def upgrade():
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_index(op.f('ix_shipping_orders_code'), 'shipping_orders', ['code'], unique=False)
-    op.create_index(op.f('ix_shipping_orders_created_at'), 'shipping_orders', ['created_at'], unique=False)
-    op.create_index(op.f('ix_shipping_orders_id'), 'shipping_orders', ['id'], unique=False)
-    op.create_index(op.f('ix_shipping_orders_store_id'), 'shipping_orders', ['store_id'], unique=False)
+    op.create_index(op.f('ix_consignments_code'), 'consignments', ['code'], unique=False)
+    op.create_index(op.f('ix_consignments_created_at'), 'consignments', ['created_at'], unique=False)
+    op.create_index(op.f('ix_consignments_id'), 'consignments', ['id'], unique=False)
+    op.create_index(op.f('ix_consignments_store_id'), 'consignments', ['store_id'], unique=False)
+    op.create_table('deposit_bills',
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=True),
+    sa.Column('user_fullname', sa.String(length=255), nullable=True),
+    sa.Column('amount', sa.Float(), nullable=True),
+    sa.Column('deposit_type', sa.Integer(), nullable=True),
+    sa.Column('note', sa.Text(), nullable=True),
+    sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index(op.f('ix_deposit_bills_created_at'), 'deposit_bills', ['created_at'], unique=False)
+    op.create_index(op.f('ix_deposit_bills_id'), 'deposit_bills', ['id'], unique=False)
     op.create_table('user_roles',
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('role_id', sa.Integer(), nullable=False),
@@ -155,20 +155,55 @@ def upgrade():
     sa.PrimaryKeyConstraint('user_id', 'role_id'),
     sa.UniqueConstraint('user_id', 'role_id', name='unique_user_role')
     )
+    op.create_table('shipments',
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('consignment_id', sa.Integer(), nullable=False),
+    sa.Column('shipment_status', sa.Integer(), nullable=False),
+    sa.Column('finance_status', sa.Integer(), nullable=False),
+    sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.Column('updated_at', sa.DateTime(), nullable=True),
+    sa.ForeignKeyConstraint(['consignment_id'], ['consignments.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index(op.f('ix_shipments_created_at'), 'shipments', ['created_at'], unique=False)
+    op.create_index(op.f('ix_shipments_id'), 'shipments', ['id'], unique=False)
+    op.create_table('fulfillments',
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('consignment_id', sa.Integer(), nullable=False),
+    sa.Column('shipment_id', sa.Integer(), nullable=False),
+    sa.Column('customer_name', sa.String(length=255), nullable=False),
+    sa.Column('customer_phone_number', sa.String(length=32), nullable=False),
+    sa.Column('customer_address', sa.String(length=2056), nullable=False),
+    sa.Column('status', sa.Integer(), nullable=False),
+    sa.Column('shipping_type', sa.Integer(), nullable=False),
+    sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.Column('updated_at', sa.DateTime(), nullable=True),
+    sa.ForeignKeyConstraint(['consignment_id'], ['consignments.id'], ),
+    sa.ForeignKeyConstraint(['shipment_id'], ['shipments.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index(op.f('ix_fulfillments_created_at'), 'fulfillments', ['created_at'], unique=False)
+    op.create_index(op.f('ix_fulfillments_id'), 'fulfillments', ['id'], unique=False)
     # ### end Alembic commands ###
 
 
 def downgrade():
     # ### commands auto generated by Alembic - please adjust! ###
+    op.drop_index(op.f('ix_fulfillments_id'), table_name='fulfillments')
+    op.drop_index(op.f('ix_fulfillments_created_at'), table_name='fulfillments')
+    op.drop_table('fulfillments')
+    op.drop_index(op.f('ix_shipments_id'), table_name='shipments')
+    op.drop_index(op.f('ix_shipments_created_at'), table_name='shipments')
+    op.drop_table('shipments')
     op.drop_table('user_roles')
-    op.drop_index(op.f('ix_shipping_orders_store_id'), table_name='shipping_orders')
-    op.drop_index(op.f('ix_shipping_orders_id'), table_name='shipping_orders')
-    op.drop_index(op.f('ix_shipping_orders_created_at'), table_name='shipping_orders')
-    op.drop_index(op.f('ix_shipping_orders_code'), table_name='shipping_orders')
-    op.drop_table('shipping_orders')
     op.drop_index(op.f('ix_deposit_bills_id'), table_name='deposit_bills')
     op.drop_index(op.f('ix_deposit_bills_created_at'), table_name='deposit_bills')
     op.drop_table('deposit_bills')
+    op.drop_index(op.f('ix_consignments_store_id'), table_name='consignments')
+    op.drop_index(op.f('ix_consignments_id'), table_name='consignments')
+    op.drop_index(op.f('ix_consignments_created_at'), table_name='consignments')
+    op.drop_index(op.f('ix_consignments_code'), table_name='consignments')
+    op.drop_table('consignments')
     op.drop_index(op.f('ix_users_phone_number'), table_name='users')
     op.drop_index(op.f('ix_users_id'), table_name='users')
     op.drop_index(op.f('ix_users_full_name'), table_name='users')

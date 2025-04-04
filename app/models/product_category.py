@@ -14,4 +14,4 @@ class ProductCategory(Base):
     level = Column(Integer(), nullable=False, default=0)
     is_active = Column(Boolean(), nullable=False, default=True)
 
-    shipping_orders = relationship("ShippingOrder", back_populates="product_category")
+    consignments = relationship("Consignment", back_populates="product_category")

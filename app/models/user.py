@@ -28,5 +28,5 @@ class User(Base):
 
     user_role = relationship("UserRole", back_populates="user", uselist=False)
     account = relationship("Account", back_populates="users")
-    shipping_orders = relationship("ShippingOrder", back_populates="user")
+    consignments = relationship("Consignment", back_populates="user")
     deposit_bills = relationship("DepositBill", back_populates="user")

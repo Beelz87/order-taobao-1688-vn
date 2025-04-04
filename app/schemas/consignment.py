@@ -1,10 +1,11 @@
 from datetime import datetime
+from typing import List
 from uuid import uuid4
 
 from pydantic import BaseModel
 
 
-class ShippingOrderBase(BaseModel):
+class ConsignmentBase(BaseModel):
     user_id: int
     receive_store_id: int
     shipping_name: str
@@ -39,19 +40,20 @@ class ShippingOrderBase(BaseModel):
     product_category_id: int
 
     code: uuid4
+    foreign_shipping_codes: List[str] = None
 
 
 # Properties to receive via API on creation
-class ShippingOrderCreate(ShippingOrderBase):
+class ConsignmentCreate(ConsignmentBase):
     pass
 
 
 # Properties to receive via API on update
-class ShippingOrderUpdate(ShippingOrderBase):
+class ConsignmentUpdate(ConsignmentBase):
     pass
 
 
-class ShippingOrderInDBBase(ShippingOrderBase):
+class ConsignmentInDBBase(ConsignmentBase):
     id: int
 
     class Config:
@@ -59,10 +61,10 @@ class ShippingOrderInDBBase(ShippingOrderBase):
 
 
 # Additional properties to return via API
-class ShippingOrder(ShippingOrderInDBBase):
+class Consignment(ConsignmentInDBBase):
     pass
 
 
 # Additional properties stored in DB
-class ShippingOrderInDB(ShippingOrderInDBBase):
+class ConsignmentInDB(ConsignmentInDBBase):
     pass
