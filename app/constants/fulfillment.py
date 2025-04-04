@@ -7,3 +7,9 @@ class FulfillmentShippingType(Enum):
     VT_POST = 2
     URBAN_DELIVERY = 3
     PICKUP_AT_WAREHOUSE = 4
+
+
+class FulfillmentStatus(Enum):
+    WAITING = 0
+    SHIPPING = 1
+    SHIPPED = 2
