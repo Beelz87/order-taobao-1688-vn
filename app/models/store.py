@@ -22,4 +22,4 @@ class Store(Base):
         onupdate=datetime.now(UTC),
     )
 
-    shipping_orders = relationship("ShippingOrder", back_populates="store")
+    consignments = relationship("Consignment", back_populates="store")

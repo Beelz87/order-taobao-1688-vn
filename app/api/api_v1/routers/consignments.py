@@ -10,13 +10,15 @@ from sqlalchemy.orm import Session
 from app import schemas, models, crud
 from app.api import deps
 from app.constants.role import Role
+from app.constants.shipment import ShipmentStatus, ShipmentFinanceStatus
+from app.schemas import ShipmentCreate
 from app.schemas.base.response import Response
 
-router = APIRouter(prefix="/shipping-orders", tags=["shipping-orders"])
+router = APIRouter(prefix="/consignments", tags=["consignments"])
 
 
-@router.get("", response_model=Response[List[schemas.ShippingOrder]])
-def read_shipping_orders(
+@router.get("", response_model=Response[List[schemas.Consignment]])
+def read_consignments(
     db: Session = Depends(deps.get_db),
     skip: int = 0,
     limit: int = 100,
@@ -30,7 +32,7 @@ def read_shipping_orders(
     ),
 ) -> Any:
     """
-    Retrieve all shipping_orders with optional filters.
+    Retrieve all consignments with optional filters.
     """
     filters = {}
     if id is not None:
@@ -42,40 +44,40 @@ def read_shipping_orders(
     if created_at is not None:
         filters["created_at"] = created_at
 
-    shipping_orders = []
+    consignments = []
     if current_user.user_role == Role.ADMIN:
-        shipping_orders = crud.shipping_order.get_multi(db, skip=skip, limit=limit, filters=filters)
+        consignments = crud.consignment.get_multi(db, skip=skip, limit=limit, filters=filters)
     elif current_user.user_role == Role.USER:
         filters["user_id"] = current_user.id
-        shipping_orders = crud.shipping_order.get_multi(db, skip=skip, limit=limit, filters=filters)
+        consignments = crud.consignment.get_multi(db, skip=skip, limit=limit, filters=filters)
 
-    return Response(message="", data=shipping_orders)
+    return Response(message="", data=consignments)
 
 
-@router.post("", response_model=Response[schemas.ShippingOrder])
-def create_shipping_order(
+@router.post("", response_model=Response[schemas.Consignment])
+def create_consignment(
     *,
     db: Session = Depends(deps.get_db),
-    shipping_order_in: schemas.ShippingOrderCreate,
+    consignment_in: schemas.ConsignmentCreate,
     current_user: models.User = Security(
         deps.get_current_active_user,
         scopes=[Role.ADMIN["name"], Role.SUPER_ADMIN["name"], Role.USER["name"]],
     ),
 ):
     """
-    Create new shipping_order with optional image (base64).
+    Create new consignment with optional image (base64).
     """
     if current_user.user_role == Role.USER:
-        shipping_order_in.user_id = current_user.id
+        consignment_in.user_id = current_user.id
 
     image_filename = None
 
-    if shipping_order_in.image_base64:
+    if consignment_in.image_base64:
         # 1. Xử lý base64
         try:
-            header, base64_data = shipping_order_in.image_base64.split(",", 1)
+            header, base64_data = consignment_in.image_base64.split(",", 1)
         except ValueError:
-            base64_data = shipping_order_in.image_base64
+            base64_data = consignment_in.image_base64
 
         image_data = base64.b64decode(base64_data)
 
@@ -83,7 +85,7 @@ def create_shipping_order(
         today = datetime.now(UTC)
         upload_subdir = os.path.join(
             "uploads",
-            "shipping_orders",
+            "consignments",
             str(today.year),
             f"{today.month:02}",
             f"{today.day:02}"
@@ -98,42 +100,47 @@ def create_shipping_order(
             f.write(image_data)
 
     # 4. Lưu thông tin vào DB
-    shipping_order_data = shipping_order_in.model_dump()
+    consignment_data = consignment_in.model_dump()
     if image_filename:
-        shipping_order_data["image_path"] = image_path  # full relative path
+        consignment_data["image_path"] = image_path  # full relative path
 
-    shipping_order = crud.shipping_order.create(db, obj_in=shipping_order_data)
+    consignment = crud.consignment.create(db, obj_in=consignment_data)
 
-    return Response(message="", data=shipping_order)
+    shipment_in = ShipmentCreate(consignment_id=consignment.id,
+                                 shipment_status=ShipmentStatus.FOREIGN_SHIPPING.value,
+                                 finance_status=ShipmentFinanceStatus.NotApproved.value)
+    crud.shipment.create(db, obj_in=shipment_in)
+
+    return Response(message="", data=consignment)
 
 
-@router.put("/{shipping_order_id}", response_model=Response[schemas.ShippingOrder])
-def update_shipping_order(
+@router.put("/{consignment_id}", response_model=Response[schemas.Consignment])
+def update_consignment(
     *,
     db: Session = Depends(deps.get_db),
-    shipping_order_id: int,
-    store_in: schemas.StoreUpdate,
+    consignment_id: int,
+    consignment_in: schemas.ConsignmentUpdate,
     current_user: models.User = Security(
         deps.get_current_active_user,
         scopes=[Role.ADMIN["name"], Role.SUPER_ADMIN["name"], Role.USER["name"]],
     ),
 ) -> Any:
     """
-    update shipping_order.
+    update consignment.
     """
-    shipping_order = crud.shipping_order.get(db, id=shipping_order_id)
-    if not shipping_order:
+    consignment = crud.consignment.get(db, id=consignment_id)
+    if not consignment:
         raise HTTPException(
             status_code=404,
-            detail="The store does not exist in the system."
+            detail="The consignment does not exist in the system."
         )
 
-    if shipping_order.user_id != current_user.id:
+    if current_user.user_role == Role.USER and consignment.user_id != current_user.id:
         raise HTTPException(
             status_code=403,
             detail="You do not have permission to perform this action."
         )
 
-    shipping_order = crud.shipping_order.update(db, obj_in=store_in)
+    consignment = crud.consignment.update(db, obj_in=consignment_in)
 
-    return Response(message="", data=shipping_order)
+    return Response(message="", data=consignment)

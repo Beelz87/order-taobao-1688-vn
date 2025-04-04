@@ -6,6 +6,8 @@ from .user import User, UserCreate, UserInDB, UserUpdate
 from .user_role import UserRole, UserRoleCreate, UserRoleInDB, UserRoleUpdate
 from .exchange import Exchange, ExchangeCreate, ExchangeInDB, ExchangeUpdate
 from .store import Store, StoreCreate, StoreInDB, StoreUpdate
-from .shipping_order import ShippingOrder, ShippingOrderCreate, ShippingOrderInDB, ShippingOrderUpdate
+from .consignment import Consignment, ConsignmentCreate, ConsignmentInDB, ConsignmentUpdate
 from .product_category import ProductCategory, ProductCategoryCreate, ProductCategoryInDB, ProductCategoryUpdate
 from .deposit_bill import DepositBill, DepositBillCreate, DepositBillInDB, DepositBillUpdate
+from .shipment import Shipment, ShipmentCreate, ShipmentInDB, ShipmentUpdate
+from .fulfillment import Fulfillment, FulfillmentCreate, FulfillmentInDB, FulfillmentUpdate

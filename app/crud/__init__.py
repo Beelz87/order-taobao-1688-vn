@@ -4,6 +4,8 @@ from .crud_user import user
 from .crud_user_role import user_role
 from .crud_exchange import exchange
 from .crud_store import store
-from .crud_shipping_order import shipping_order
+from .crud_consignment import consignment
 from .crud_product_category import product_category
 from .crud_deposit_bill import deposit_bill
+from .crud_shipment import shipment
+from .crud_fulfillment import fulfillment

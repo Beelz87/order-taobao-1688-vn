@@ -6,13 +6,13 @@ from sqlalchemy.orm import relationship
 from app.db.base_class import Base
 
 
-class ShippingOrder(Base):
-    __tablename__ = "shipping_orders"
+class Consignment(Base):
+    __tablename__ = "consignments"
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
 
     user_id = Column(Integer(), ForeignKey("users.id"), nullable=False)
-    user = relationship("User", back_populates="shipping_orders")
+    user = relationship("User", back_populates="consignments")
 
     shipping_name = Column(String(255), nullable=False)
     shipping_phone_number = Column(String(13), nullable=False)
@@ -20,7 +20,7 @@ class ShippingOrder(Base):
     store_id = Column(
         Integer(), ForeignKey("stores.id"), index=True, nullable=False
     )
-    store = relationship("Store", back_populates="shipping_orders")
+    store = relationship("Store", back_populates="consignments")
 
     shipping_status = Column(Integer(), nullable=False)
     store_status = Column(Integer(), nullable=False)
@@ -61,9 +61,11 @@ class ShippingOrder(Base):
     product_category_id = Column(
         Integer(), ForeignKey("product_categories.id"), nullable=False
     )
-    product_category = relationship("ProductCategory", back_populates="shipping_orders")
+    product_category = relationship("ProductCategory", back_populates="consignments")
 
     number_of_packages = Column(Integer(), nullable=False, default=1)
     domestic_shipping_fee = Column(Float(), nullable=False, default=0.0)
     code = Column(UUID(), nullable=False, index=True)
+
+    shipment = relationship("Shipment", back_populates="consignment")
 
