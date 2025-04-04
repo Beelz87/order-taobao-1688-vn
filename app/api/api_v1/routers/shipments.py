@@ -5,7 +5,9 @@ from sqlalchemy.orm import Session
 
 from app import schemas, models, crud
 from app.api import deps
+from app.constants.fulfillment import FulfillmentShippingType, FulfillmentStatus
 from app.constants.role import Role
+from app.constants.shipment import ShipmentStatus
 from app.schemas.base.response import Response
 
 router = APIRouter(prefix="/shipments", tags=["shipments"])
@@ -66,5 +68,17 @@ def update_shipment(
 
     shipment = crud.shipment.update(db, obj_in=shipment_in)
     shipment.consignment = crud.consignment.get(db, id=shipment.consignment_id)
+
+    if shipment.shipment_status == ShipmentStatus.VN_SHIPPING:
+        fulfillment_in = schemas.FulfillmentCreate(
+            consignment_id=shipment.consignment_id,
+            shipment_id=shipment.id,
+            status=FulfillmentStatus.WAITING.value,
+            shipping_type=FulfillmentShippingType.BUS_SHIPMENT.value,
+            customer_name=shipment.consignment.customer_name,
+            customer_phone_number=shipment.consignment.customer_phone_number,
+            customer_address=shipment.consignment.customer_address
+        )
+        crud.fulfillment.create(db, obj_in=fulfillment_in)
 
     return Response(message="", data=shipment)

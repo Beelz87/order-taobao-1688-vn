@@ -108,7 +108,7 @@ def create_consignment(
 
     shipment_in = ShipmentCreate(consignment_id=consignment.id,
                                  shipment_status=ShipmentStatus.FOREIGN_SHIPPING.value,
-                                 finance_status=ShipmentFinanceStatus.NotApproved.value)
+                                 finance_status=ShipmentFinanceStatus.NOT_APPROVED.value)
     crud.shipment.create(db, obj_in=shipment_in)
 
     return Response(message="", data=consignment)
