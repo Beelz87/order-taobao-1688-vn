@@ -7,8 +7,6 @@ class StoreBase(BaseModel):
     name: str
     description: str
     is_active: bool
-    created_at: datetime
-    updated_at: datetime
 
 
 # Properties to receive via API on creation

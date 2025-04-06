@@ -65,7 +65,7 @@ class Consignment(Base):
 
     number_of_packages = Column(Integer(), nullable=False, default=1)
     domestic_shipping_fee = Column(Float(), nullable=False, default=0.0)
-    code = Column(UUID(), nullable=False, index=True)
+    code = Column(String(255), nullable=False, index=True)
 
     shipment = relationship("Shipment", back_populates="consignment")
 

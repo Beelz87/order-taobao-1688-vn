@@ -7,7 +7,7 @@ class ExchangeBase(BaseModel):
     foreign_currency: str
     local_currency: str
     is_active: bool
-    rate: float
+    exchange_rate: float
     type: int
 
 

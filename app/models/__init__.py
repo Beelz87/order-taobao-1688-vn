@@ -6,3 +6,4 @@ from .product_category import ProductCategory
 from .deposit_bill import DepositBill
 from .shipment import Shipment
 from .fulfillment import Fulfillment
+from .consignment_foreign_shipment_code import ConsignmentForeignShipmentCode

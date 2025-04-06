@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 from uuid import uuid4
 
 from pydantic import BaseModel
@@ -7,7 +7,7 @@ from pydantic import BaseModel
 
 class ConsignmentBase(BaseModel):
     user_id: int
-    receive_store_id: int
+    store_id: int
     shipping_name: str
     shipping_address: str
     shipping_phone_number: str
@@ -36,16 +36,17 @@ class ConsignmentBase(BaseModel):
     insurance_required_fee: float = 0.0
     item_count_check_required_fee: float = 0.0
 
+    number_of_packages: int
     domestic_shipping_fee: float = 0.0
     product_category_id: int
 
-    code: uuid4
     foreign_shipping_codes: List[str] = None
+    image_base64: str = None
 
 
 # Properties to receive via API on creation
 class ConsignmentCreate(ConsignmentBase):
-    pass
+    image_path: Optional[str] = None
 
 
 # Properties to receive via API on update
@@ -55,6 +56,7 @@ class ConsignmentUpdate(ConsignmentBase):
 
 class ConsignmentInDBBase(ConsignmentBase):
     id: int
+    code: str
 
     class Config:
         from_attributes = True

@@ -44,13 +44,13 @@ def read_consignments(
     if created_at is not None:
         filters["created_at"] = created_at
 
-    consignments = []
-    if current_user.user_role == Role.ADMIN:
-        consignments = crud.consignment.get_multi(db, skip=skip, limit=limit, filters=filters)
-    elif current_user.user_role == Role.USER:
-        filters["user_id"] = current_user.id
-        consignments = crud.consignment.get_multi(db, skip=skip, limit=limit, filters=filters)
-
+    #consignments = []
+    #if current_user.user_role == Role.ADMIN or current_user.user_role == Role.SUPER_ADMIN:
+    #    consignments = crud.consignment.get_multi(db, skip=skip, limit=limit, filters=filters)
+    #elif current_user.user_role == Role.USER:
+    #    filters["user_id"] = current_user.id
+    #    consignments = crud.consignment.get_multi(db, skip=skip, limit=limit, filters=filters)
+    consignments = crud.consignment.get_multi(db, skip=skip, limit=limit, filters=filters)
     return Response(message="", data=consignments)
 
 
@@ -99,18 +99,15 @@ def create_consignment(
         with open(image_path, "wb") as f:
             f.write(image_data)
 
-    # 4. Lưu thông tin vào DB
-    consignment_data = consignment_in.model_dump()
-    if image_filename:
-        consignment_data["image_path"] = image_path  # full relative path
-
-    consignment = crud.consignment.create(db, obj_in=consignment_data)
+        # 4. Lưu thông tin vào DB
+        consignment_in.image_path = image_path  # full relative path
+    consignment = crud.consignment.create(db, obj_in=consignment_in)
 
     shipment_in = ShipmentCreate(consignment_id=consignment.id,
                                  shipment_status=ShipmentStatus.FOREIGN_SHIPPING.value,
                                  finance_status=ShipmentFinanceStatus.NOT_APPROVED.value)
     crud.shipment.create(db, obj_in=shipment_in)
-
+    
     return Response(message="", data=consignment)
 
 

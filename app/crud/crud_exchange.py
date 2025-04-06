@@ -20,7 +20,7 @@ class CRUDExchange(CRUDBase[Exchange, ExchangeCreate, ExchangeUpdate]):
             foreign_currency=obj_in.foreign_currency,
             local_currency=obj_in.local_currency,
             is_active=obj_in.is_active,
-            exchange_rate=obj_in.rate,
+            exchange_rate=obj_in.exchange_rate,
             type=obj_in.type,
         )
         db.add(db_obj)

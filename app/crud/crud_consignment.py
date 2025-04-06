@@ -43,15 +43,14 @@ class CRUDConsignment(CRUDBase[Consignment, ConsignmentCreate, ConsignmentUpdate
             product_category_id=obj_in.product_category_id,
             number_of_packages=obj_in.number_of_packages,
             domestic_shipping_fee=obj_in.domestic_shipping_fee,
-            code=uuid.uuid4(),
-            foreign_shipping_code=obj_in.foreign_shipping_code
+            code=uuid.uuid4().__str__()
         )
         db.add(db_obj)
         db.commit()
         db.refresh(db_obj)
 
-        if obj_in.foreign_shipping_code:
-            for code in obj_in.foreign_shipping_code:
+        if obj_in.foreign_shipping_codes:
+            for code in obj_in.foreign_shipping_codes:
                 db_obj_foreign_code = ConsignmentForeignShipmentCode(
                     consignment_id=db_obj.id,
                     foreign_shipment_code=code
