@@ -28,7 +28,6 @@ class FulfillmentUpdate(BaseModel):
 
 class FulfillmentInDBBase(FulfillmentBase):
     id: int
-    consignment: Optional[Consignment]
     created_at: datetime
     updated_at: datetime
 
