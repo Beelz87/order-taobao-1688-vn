@@ -71,15 +71,15 @@ def update_shipment(
     shipment = crud.shipment.update(db, db_obj=shipment, obj_in=shipment_in)
     shipment.consignment = crud.consignment.get(db, id=shipment.consignment_id)
 
-    if shipment.shipment_status == ShipmentStatus.VN_SHIPPING:
+    if shipment_in.shipment_status == ShipmentStatus.VN_SHIPPING.value:
         fulfillment_in = schemas.FulfillmentCreate(
             consignment_id=shipment.consignment_id,
             shipment_id=shipment.id,
             status=FulfillmentStatus.WAITING.value,
             shipping_type=FulfillmentShippingType.BUS_SHIPMENT.value,
-            customer_name=shipment.consignment.customer_name,
-            customer_phone_number=shipment.consignment.customer_phone_number,
-            customer_address=shipment.consignment.customer_address
+            customer_name=shipment.consignment.shipping_name,
+            customer_phone_number=shipment.consignment.shipping_phone_number,
+            customer_address=shipment.consignment.shipping_address
         )
         crud.fulfillment.create(db, obj_in=fulfillment_in)
 

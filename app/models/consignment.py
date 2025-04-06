@@ -16,6 +16,7 @@ class Consignment(Base):
 
     shipping_name = Column(String(255), nullable=False)
     shipping_phone_number = Column(String(13), nullable=False)
+    shipping_address = Column(String(2056), nullable=False)
 
     store_id = Column(
         Integer(), ForeignKey("stores.id"), index=True, nullable=False
@@ -41,8 +42,6 @@ class Consignment(Base):
         default=datetime.now(UTC),
         onupdate=datetime.now(UTC),
     )
-
-    shipping_address = Column(String(2056), nullable=False)
 
     contains_liquid = Column(Boolean(), nullable=False, default=False)
     is_fragile = Column(Boolean(), nullable=False, default=False)
