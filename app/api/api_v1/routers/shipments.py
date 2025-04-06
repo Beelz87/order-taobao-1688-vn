@@ -36,12 +36,14 @@ def read_shipments(
     if finance_status is not None:
         filters["finance_status"] = finance_status
 
-    shipments = []
-    if current_user.user_role == Role.ADMIN or current_user.user_role == Role.SUPER_ADMIN:
-        shipments = crud.shipment.get_multi(db, skip=skip, limit=limit, filters=filters)
-    elif current_user.user_role == Role.USER:
-        filters["user_id"] = current_user.id
-        shipments = crud.shipment.get_multi(db, skip=skip, limit=limit, filters=filters)
+    # shipments = []
+    # if current_user.user_role == Role.ADMIN or current_user.user_role == Role.SUPER_ADMIN:
+    #     shipments = crud.shipment.get_multi(db, skip=skip, limit=limit, filters=filters)
+    # elif current_user.user_role == Role.USER:
+    #     filters["user_id"] = current_user.id
+    #     shipments = crud.shipment.get_multi(db, skip=skip, limit=limit, filters=filters)
+
+    shipments = crud.shipment.get_multi(db, skip=skip, limit=limit, filters=filters)
 
     return Response(message="", data=shipments)
 
