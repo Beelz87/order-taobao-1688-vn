@@ -11,4 +11,4 @@ class ShipmentStatus(Enum):
 
 class ShipmentFinanceStatus(Enum):
     NOT_APPROVED = 0
-    approved = 1
+    APPROVED = 1

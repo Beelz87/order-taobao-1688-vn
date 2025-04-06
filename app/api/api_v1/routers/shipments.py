@@ -22,7 +22,7 @@ def read_shipments(
     finance_status: int = None,
     current_user: models.User = Security(
         deps.get_current_active_user,
-        scopes=[Role.ADMIN["name"], Role.SUPER_ADMIN["name"], Role.USER["name"]],
+        scopes=[Role.ADMIN["name"], Role.SUPER_ADMIN["name"]],
     ),
 ) -> Any:
     """
@@ -37,7 +37,7 @@ def read_shipments(
         filters["finance_status"] = finance_status
 
     shipments = []
-    if current_user.user_role == Role.ADMIN:
+    if current_user.user_role == Role.ADMIN or current_user.user_role == Role.SUPER_ADMIN:
         shipments = crud.shipment.get_multi(db, skip=skip, limit=limit, filters=filters)
     elif current_user.user_role == Role.USER:
         filters["user_id"] = current_user.id

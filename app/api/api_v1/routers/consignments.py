@@ -70,8 +70,6 @@ def create_consignment(
     if current_user.user_role == Role.USER:
         consignment_in.user_id = current_user.id
 
-    image_filename = None
-
     if consignment_in.image_base64:
         # 1. Xử lý base64
         try:
