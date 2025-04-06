@@ -59,7 +59,7 @@ def update_fulfillment(
             detail="The fulfillment does not exist in the system."
         )
 
-    fulfillment = crud.fulfillment.update(db, obj_in=fulfillment_in)
+    fulfillment = crud.fulfillment.update(db, db_obj=fulfillment, obj_in=fulfillment_in)
     fulfillment.consignment = crud.consignment.get(db, id=fulfillment.consignment_id)
 
     return Response(message="", data=fulfillment)

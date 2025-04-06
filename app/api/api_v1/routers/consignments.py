@@ -136,6 +136,6 @@ def update_consignment(
             detail="You do not have permission to perform this action."
         )
 
-    consignment = crud.consignment.update(db, obj_in=consignment_in)
+    consignment = crud.consignment.update(db, db_obj=consignment, obj_in=consignment_in)
 
     return Response(message="", data=consignment)

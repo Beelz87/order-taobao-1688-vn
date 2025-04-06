@@ -65,6 +65,6 @@ def update_store(
             status_code=404,
             detail="The store does not exist in the system.",
         )
-    store = crud.store.update(db, obj_in=store_in)
+    store = crud.store.update(db, db_obj=store, obj_in=store_in)
 
     return Response(message="", data=store)
