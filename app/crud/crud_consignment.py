@@ -1,6 +1,7 @@
 import uuid
 from typing import Union, Dict, Any, List
 
+from sqlalchemy import desc, asc
 from sqlalchemy.orm import Session
 
 from app.crud.base import CRUDBase
@@ -94,12 +95,22 @@ class CRUDConsignment(CRUDBase[Consignment, ConsignmentCreate, ConsignmentUpdate
         return updated_data
 
     def get_multi(
-            self, db: Session, *, skip: int = 0, limit: int = 100, filters: Dict[str, Any] = None
+            self, db: Session, *, skip: int = 0, limit: int = 100, filters: Dict[str, Any] = None,
+                                              order_by = "id", direction = "desc"
     ) -> List[Consignment]:
         query = db.query(self.model)
         if filters:
             for key, value in filters.items():
                 query = query.filter(getattr(self.model, key) == value)
+
+        try:
+            if direction.lower() == "desc":
+                query = query.order_by(desc(order_by))
+            else:
+                query = query.order_by(asc(order_by))
+        except Exception as e:
+            raise ValueError(f"Invalid order_by format: {order_by}") from e
+
         return query.offset(skip).limit(limit).all()
 
     def get_by_user_id(self, db: Session, *, user_id: int) -> List[Consignment]:

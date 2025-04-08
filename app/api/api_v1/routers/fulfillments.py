@@ -18,6 +18,8 @@ def read_fulfillments(
     consignment_id: int = None,
     fulfillment_status: int = None,
     finance_status: int = None,
+    order_by: str = "id",
+    direction: str = "desc",
     current_user: models.User = Security(
         deps.get_current_active_user,
         scopes=[Role.ADMIN["name"], Role.SUPER_ADMIN["name"]],
@@ -34,7 +36,8 @@ def read_fulfillments(
     if finance_status is not None:
         filters["finance_status"] = finance_status
 
-    fulfillments = crud.fulfillment.get_multi(db, skip=skip, limit=limit, filters=filters)
+    fulfillments = crud.fulfillment.get_multi(db, skip=skip, limit=limit, filters=filters,
+                                              order_by=order_by, direction=direction)
 
     return Response(message="", data=fulfillments)
 

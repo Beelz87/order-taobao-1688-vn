@@ -20,6 +20,8 @@ def read_shipments(
     consignment_id: int = None,
     shipment_status: int = None,
     finance_status: int = None,
+    order_by: str = "id",
+    direction: str = "desc",
     current_user: models.User = Security(
         deps.get_current_active_user,
         scopes=[Role.ADMIN["name"], Role.SUPER_ADMIN["name"]],
@@ -43,7 +45,8 @@ def read_shipments(
     #     filters["user_id"] = current_user.id
     #     shipments = crud.shipment.get_multi(db, skip=skip, limit=limit, filters=filters)
 
-    shipments = crud.shipment.get_multi(db, skip=skip, limit=limit, filters=filters)
+    shipments = crud.shipment.get_multi(db, skip=skip, limit=limit, filters=filters,
+                                              order_by=order_by, direction=direction)
 
     return Response(message="", data=shipments)
 

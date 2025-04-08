@@ -26,6 +26,8 @@ def read_consignments(
     code: str = None,
     store_id: int = None,
     created_at: datetime = None,
+    order_by: str = "id",
+    direction: str = "desc",
     current_user: models.User = Security(
         deps.get_current_active_user,
         scopes=[Role.ADMIN["name"], Role.SUPER_ADMIN["name"], Role.USER["name"]],
@@ -50,7 +52,8 @@ def read_consignments(
     #elif current_user.user_role == Role.USER:
     #    filters["user_id"] = current_user.id
     #    consignments = crud.consignment.get_multi(db, skip=skip, limit=limit, filters=filters)
-    consignments = crud.consignment.get_multi(db, skip=skip, limit=limit, filters=filters)
+    consignments = crud.consignment.get_multi(db, skip=skip, limit=limit, filters=filters,
+                                              order_by=order_by, direction=direction)
     return Response(message="", data=consignments)
 
 
@@ -105,7 +108,7 @@ def create_consignment(
                                  shipment_status=ShipmentStatus.FOREIGN_SHIPPING.value,
                                  finance_status=ShipmentFinanceStatus.NOT_APPROVED.value)
     crud.shipment.create(db, obj_in=shipment_in)
-    
+    consignment.image_path = consignment_in.image_path
     return Response(message="", data=consignment)
 
 

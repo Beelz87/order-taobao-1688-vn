@@ -90,7 +90,7 @@ class ConsignmentInDBBase(BaseModel):
     domestic_shipping_fee: float = 0.0
     product_category_id: int
     code: str
-    image_path: str
+    image_path: Optional[str] = None
 
     class Config:
         from_attributes = True
