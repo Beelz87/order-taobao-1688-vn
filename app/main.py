@@ -7,12 +7,15 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.api.api_v1.api import api_router
 from app.core.config import settings
+from fastapi.staticfiles import StaticFiles
 
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
     openapi_url=f"{settings.API_V1_STR}/openapi.json",
 )
+
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 
 @app.exception_handler(StarletteHTTPException)
