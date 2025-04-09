@@ -1,6 +1,5 @@
 from datetime import datetime
 from typing import List, Optional
-from uuid import uuid4
 
 from pydantic import BaseModel
 
@@ -24,8 +23,6 @@ class ConsignmentBase(BaseModel):
     height_packaged: float
     wide_packaged: float
     length_packaged: float
-    created_at: datetime
-    updated_at: datetime
 
     contains_liquid: bool = False
     is_fragile: bool = False
@@ -43,7 +40,7 @@ class ConsignmentBase(BaseModel):
     domestic_shipping_fee: float = 0.0
     product_category_id: int
 
-    foreign_shipping_codes: List[str] = None
+    foreign_shipment_codes: List[str] = None
     image_base64: str = None
 
 
@@ -96,7 +93,7 @@ class ConsignmentInDBBase(BaseModel):
     code: str
     image_path: Optional[str] = None
 
-    foreign_shipping_codes: Optional[List[ConsignmentForeignShipmentCode]] = None
+    foreign_shipment_codes: Optional[List[ConsignmentForeignShipmentCode]] = None
 
     class Config:
         from_attributes = True

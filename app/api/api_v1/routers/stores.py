@@ -24,7 +24,10 @@ def read_stores(
     """
     Retrieve all stores.
     """
-    stores = crud.store.get_multi(db, skip=skip, limit=limit, type_store=type_store)
+    filters = {}
+    if type_store is not None:
+        filters["type_store"] = type_store
+    stores = crud.store.get_multi(db, skip=skip, limit=limit, filters=filters)
 
     return Response(message="", data=stores)
 
