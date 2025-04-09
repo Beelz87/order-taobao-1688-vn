@@ -64,8 +64,8 @@ class CRUDConsignment(CRUDBase[Consignment, ConsignmentCreate, ConsignmentUpdate
         db.commit()
         db.refresh(db_obj)
 
-        if obj_in.foreign_shipping_codes:
-            for code in obj_in.foreign_shipping_codes:
+        if obj_in.foreign_shipment_codes:
+            for code in obj_in.foreign_shipment_codes:
                 db_obj_foreign_code = ConsignmentForeignShipmentCode(
                     consignment_id=db_obj.id,
                     foreign_shipment_code=code
