@@ -1,14 +1,13 @@
-import uuid
+from datetime import datetime, UTC
 from typing import Union, Dict, Any, List
 
-from sqlalchemy import desc, asc
 from sqlalchemy.orm import Session
 
+from app import crud
 from app.crud.base import CRUDBase
 from app.models import Consignment
 from app.models.consignment_foreign_shipment_code import ConsignmentForeignShipmentCode
 from app.schemas.consignment import ConsignmentUpdate, ConsignmentCreate
-from app import crud
 
 
 class CRUDConsignment(CRUDBase[Consignment, ConsignmentCreate, ConsignmentUpdate]):
@@ -17,7 +16,12 @@ class CRUDConsignment(CRUDBase[Consignment, ConsignmentCreate, ConsignmentUpdate
         if not store:
             raise ValueError(f"Store with id {obj_in.store_id} does not exist.")
 
-        code = f"{store.code}"
+        product_category_code = obj_in.product_category_id
+        if product_category_code > 10 and product_category_code < 100:
+            product_category_code = f"0{obj_in.product_category_id}"
+        elif product_category_code <10:
+            product_category_code = f"00{obj_in.product_category_id}"
+        code = f"{store.code}{store.code}{product_category_code}{000}{round(datetime.now(UTC).timestamp() * 1000)}"
 
         db_obj = Consignment(
             user_id=obj_in.user_id,
@@ -52,7 +56,7 @@ class CRUDConsignment(CRUDBase[Consignment, ConsignmentCreate, ConsignmentUpdate
             product_category_id=obj_in.product_category_id,
             number_of_packages=obj_in.number_of_packages,
             domestic_shipping_fee=obj_in.domestic_shipping_fee,
-            code=uuid.uuid4().__str__()
+            code=code
         )
         db.add(db_obj)
         db.commit()
