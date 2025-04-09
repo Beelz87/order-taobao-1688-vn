@@ -8,6 +8,7 @@ class StoreBase(BaseModel):
     description: str
     is_active: bool
     type_store: int
+    code: str
 
 
 # Properties to receive via API on creation
