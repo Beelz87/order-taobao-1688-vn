@@ -12,16 +12,20 @@ from app.schemas.consignment import ConsignmentUpdate, ConsignmentCreate
 
 class CRUDConsignment(CRUDBase[Consignment, ConsignmentCreate, ConsignmentUpdate]):
     def create(self, db: Session, *, obj_in: ConsignmentCreate) -> Consignment:
-        store = crud.store.get(db, id=obj_in.store_id)
-        if not store:
-            raise ValueError(f"Store with id {obj_in.store_id} does not exist.")
+        source_store = crud.store.get(db, id=obj_in.source_store_id)
+        if not source_store:
+            raise ValueError(f"Store with id {obj_in.source_store} does not exist.")
+
+        dest_store = crud.store.get(db, id=obj_in.dest_store_id)
+        if not dest_store:
+            raise ValueError(f"Store with id {obj_in.dest_store} does not exist.")
 
         product_category_code = obj_in.product_category_id
         if product_category_code > 10 and product_category_code < 100:
             product_category_code = f"0{obj_in.product_category_id}"
         elif product_category_code <10:
             product_category_code = f"00{obj_in.product_category_id}"
-        code = f"{store.code}{store.code}{product_category_code}{000}{round(datetime.now(UTC).timestamp() * 1000)}"
+        code = f"{source_store.code}{dest_store.code}{product_category_code}{000}{round(datetime.now(UTC).timestamp() * 1000)}"
 
         db_obj = Consignment(
             user_id=obj_in.user_id,
