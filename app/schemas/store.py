@@ -7,6 +7,7 @@ class StoreBase(BaseModel):
     name: str
     description: str
     is_active: bool
+    type_store: int
 
 
 # Properties to receive via API on creation
@@ -24,8 +25,8 @@ class StoreInDBBase(StoreBase):
     name: str
     description: str
     is_active: bool
-    created_at: datetime
-    updated_at: datetime
+    type_store: int
+    code: str
 
     class Config:
         from_attributes = True

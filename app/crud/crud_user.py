@@ -41,11 +41,6 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             update_data["hashed_password"] = hashed_password
         return super().update(db, db_obj=db_obj, obj_in=update_data)
 
-    def get_multi(
-        self, db: Session, *, skip: int = 0, limit: int = 100,
-    ) -> List[User]:
-        return db.query(self.model).offset(skip).limit(limit).all()
-
     def authenticate(
         self, db: Session, *, email: str, password: str
     ) -> Optional[User]:

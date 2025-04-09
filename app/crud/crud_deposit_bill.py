@@ -38,14 +38,5 @@ class CRUDDepositBill(CRUDBase[DepositBill, DepositBillCreate, DepositBillUpdate
 
         return super().update(db, db_obj=db_obj, obj_in=update_data)
 
-    def get_multi(
-            self, db: Session, *, skip: int = 0, limit: int = 100, filters: Dict[str, Any] = None
-    ) -> List[DepositBill]:
-        query = db.query(self.model)
-        if filters:
-            for key, value in filters.items():
-                query = query.filter(getattr(self.model, key) == value)
-        return query.offset(skip).limit(limit).all()
-
 
 deposit_bill = CRUDDepositBill(DepositBill)

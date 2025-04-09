@@ -15,11 +15,9 @@ class ConsignmentForeignShipmentCodeUpdate(ConsignmentForeignShipmentCodeBase):
 
 class ConsignmentForeignShipmentCodeInDBBase(ConsignmentForeignShipmentCodeBase):
     id: int
-    created_at: datetime
-    updated_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class ConsignmentForeignShipmentCode(ConsignmentForeignShipmentCodeInDBBase):
     pass

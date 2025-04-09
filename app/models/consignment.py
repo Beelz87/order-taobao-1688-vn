@@ -18,10 +18,22 @@ class Consignment(Base):
     shipping_phone_number = Column(String(13), nullable=False)
     shipping_address = Column(String(2056), nullable=False)
 
-    store_id = Column(
-        Integer(), ForeignKey("stores.id"), index=True, nullable=False
+    source_store_id = Column(
+        Integer, ForeignKey("stores.id"), nullable=False, index=True
     )
-    store = relationship("Store", back_populates="consignments")
+    dest_store_id = Column(
+        Integer, ForeignKey("stores.id"), nullable=False, index=True
+    )
+    source_store = relationship(
+        "Store",
+        foreign_keys="Consignment.source_store_id",
+        back_populates="source_consignments"
+    )
+    dest_store = relationship(
+        "Store",
+        foreign_keys="Consignment.dest_store_id",
+        back_populates="dest_consignments"
+    )
 
     shipping_status = Column(Integer(), nullable=False)
     store_status = Column(Integer(), nullable=False)
@@ -67,4 +79,5 @@ class Consignment(Base):
     code = Column(String(255), nullable=False, index=True)
 
     shipment = relationship("Shipment", back_populates="consignment")
+    foreign_shipment_codes = relationship("ConsignmentForeignShipmentCode", back_populates="consignment")
 

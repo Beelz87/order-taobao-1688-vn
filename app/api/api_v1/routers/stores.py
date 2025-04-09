@@ -15,6 +15,7 @@ def read_stores(
     db: Session = Depends(deps.get_db),
     skip: int = 0,
     limit: int = 100,
+    type_store: int = None,
     current_user: models.User = Security(
         deps.get_current_active_user,
         scopes=[Role.ADMIN["name"], Role.SUPER_ADMIN["name"], Role.USER["name"]],
@@ -23,7 +24,7 @@ def read_stores(
     """
     Retrieve all stores.
     """
-    stores = crud.store.get_multi(db, skip=skip, limit=limit,)
+    stores = crud.store.get_multi(db, skip=skip, limit=limit, type_store=type_store)
 
     return Response(message="", data=stores)
 

@@ -38,25 +38,6 @@ class CRUDFulfillment(CRUDBase[Fulfillment, FulfillmentCreate, FulfillmentUpdate
 
         return super().update(db, db_obj=db_obj, obj_in=update_data)
 
-    def get_multi(
-            self, db: Session, *, skip: int = 0, limit: int = 100, filters: Dict[str, Any] = None,
-                                              order_by = "id", direction = "desc"
-    ) -> List[Fulfillment]:
-        query = db.query(self.model)
-        if filters:
-            for key, value in filters.items():
-                query = query.filter(getattr(self.model, key) == value)
-
-        try:
-            if direction.lower() == "desc":
-                query = query.order_by(desc(order_by))
-            else:
-                query = query.order_by(asc(order_by))
-        except Exception as e:
-            raise ValueError(f"Invalid order_by format: {order_by}") from e
-
-        return query.offset(skip).limit(limit).all()
-
     def get_by_user_id(self, db: Session, *, user_id: int) -> List[Fulfillment]:
         return db.query(self.model).filter(Fulfillment.user_id == user_id).all()
 

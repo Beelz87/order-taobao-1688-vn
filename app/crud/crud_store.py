@@ -13,6 +13,8 @@ class CRUDStore(CRUDBase[Store, StoreCreate, StoreUpdate]):
             name=obj_in.name,
             description=obj_in.description,
             is_active=obj_in.is_active,
+            type_store=obj_in.type_store,
+            code=obj_in.code
         )
         db.add(db_obj)
         db.commit()
@@ -32,11 +34,6 @@ class CRUDStore(CRUDBase[Store, StoreCreate, StoreUpdate]):
             update_data = obj_in.model_dump(exclude_unset=True)
 
         return super().update(db, db_obj=db_obj, obj_in=update_data)
-
-    def get_multi(
-        self, db: Session, *, skip: int = 0, limit: int = 100,
-    ) -> List[Store]:
-        return db.query(self.model).offset(skip).limit(limit).all()
 
 
 store = CRUDStore(Store)

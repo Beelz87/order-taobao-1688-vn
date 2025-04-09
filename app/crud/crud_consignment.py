@@ -8,15 +8,23 @@ from app.crud.base import CRUDBase
 from app.models import Consignment
 from app.models.consignment_foreign_shipment_code import ConsignmentForeignShipmentCode
 from app.schemas.consignment import ConsignmentUpdate, ConsignmentCreate
+from app import crud
 
 
 class CRUDConsignment(CRUDBase[Consignment, ConsignmentCreate, ConsignmentUpdate]):
     def create(self, db: Session, *, obj_in: ConsignmentCreate) -> Consignment:
+        store = crud.store.get(db, id=obj_in.store_id)
+        if not store:
+            raise ValueError(f"Store with id {obj_in.store_id} does not exist.")
+
+        code = f"{store.code}"
+
         db_obj = Consignment(
             user_id=obj_in.user_id,
             shipping_name=obj_in.shipping_name,
             shipping_phone_number=obj_in.shipping_phone_number,
-            store_id=obj_in.store_id,
+            source_store_id=obj_in.source_store_id,
+            dest_store_id=obj_in.dest_store_id,
             shipping_status=obj_in.shipping_status,
             store_status=obj_in.store_status,
             weight=obj_in.weight,
@@ -93,25 +101,6 @@ class CRUDConsignment(CRUDBase[Consignment, ConsignmentCreate, ConsignmentUpdate
             db.commit()
 
         return updated_data
-
-    def get_multi(
-            self, db: Session, *, skip: int = 0, limit: int = 100, filters: Dict[str, Any] = None,
-                                              order_by = "id", direction = "desc"
-    ) -> List[Consignment]:
-        query = db.query(self.model)
-        if filters:
-            for key, value in filters.items():
-                query = query.filter(getattr(self.model, key) == value)
-
-        try:
-            if direction.lower() == "desc":
-                query = query.order_by(desc(order_by))
-            else:
-                query = query.order_by(asc(order_by))
-        except Exception as e:
-            raise ValueError(f"Invalid order_by format: {order_by}") from e
-
-        return query.offset(skip).limit(limit).all()
 
     def get_by_user_id(self, db: Session, *, user_id: int) -> List[Consignment]:
         return db.query(self.model).filter(Consignment.user_id == user_id).all()

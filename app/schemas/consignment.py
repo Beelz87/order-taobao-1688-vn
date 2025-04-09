@@ -4,10 +4,13 @@ from uuid import uuid4
 
 from pydantic import BaseModel
 
+from app.schemas.consignment_foreign_shipment_code import ConsignmentForeignShipmentCode
+
 
 class ConsignmentBase(BaseModel):
     user_id: int
-    store_id: int
+    source_store_id: int
+    dest_store_id: int
     shipping_name: str
     shipping_address: str
     shipping_phone_number: str
@@ -57,7 +60,8 @@ class ConsignmentUpdate(ConsignmentBase):
 class ConsignmentInDBBase(BaseModel):
     id: int
     user_id: int
-    store_id: int
+    source_store_id: int
+    dest_store_id: int
     shipping_name: str
     shipping_address: str
     shipping_phone_number: str
@@ -91,6 +95,8 @@ class ConsignmentInDBBase(BaseModel):
     product_category_id: int
     code: str
     image_path: Optional[str] = None
+
+    foreign_shipping_codes: Optional[List[ConsignmentForeignShipmentCode]] = None
 
     class Config:
         from_attributes = True
