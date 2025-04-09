@@ -43,8 +43,6 @@ class CRUDConsignment(CRUDBase[Consignment, ConsignmentCreate, ConsignmentUpdate
             height_packaged=obj_in.height_packaged,
             wide_packaged=obj_in.wide_packaged,
             length_packaged=obj_in.length_packaged,
-            created_at=obj_in.created_at,
-            updated_at=obj_in.updated_at,
             shipping_address=obj_in.shipping_address,
             contains_liquid=obj_in.contains_liquid,
             is_fragile=obj_in.is_fragile,
