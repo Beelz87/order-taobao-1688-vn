@@ -1,4 +1,4 @@
-from typing import Dict, Any
+from typing import Dict, Any, List
 
 from pydantic import BaseModel
 from datetime import datetime
@@ -9,7 +9,7 @@ class ChangeLogBase(BaseModel):
     object_type: str
     object_id: int
     action: str
-    changes: Dict[str, Any]
+    changes: List[Dict[str, Any]]
     created_at: datetime | None = None
 
 
