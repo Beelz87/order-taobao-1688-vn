@@ -11,3 +11,4 @@ from .product_category import ProductCategory, ProductCategoryCreate, ProductCat
 from .deposit_bill import DepositBill, DepositBillCreate, DepositBillInDB, DepositBillUpdate
 from .shipment import Shipment, ShipmentCreate, ShipmentInDB, ShipmentUpdate
 from .fulfillment import Fulfillment, FulfillmentCreate, FulfillmentInDB, FulfillmentUpdate
+from .change_log import ChangeLog, ChangeLogCreate, ChangeLogInDB

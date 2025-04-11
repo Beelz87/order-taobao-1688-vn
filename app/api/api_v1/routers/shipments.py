@@ -71,7 +71,7 @@ def update_shipment(
             detail="The shipment does not exist in the system."
         )
 
-    shipment = crud.shipment.update(db, db_obj=shipment, obj_in=shipment_in)
+    shipment = crud.shipment.update(db, db_obj=shipment, obj_in=shipment_in, current_user_id=current_user.id)
     shipment.consignment = crud.consignment.get(db, id=shipment.consignment_id)
 
     if shipment_in.shipment_status == ShipmentStatus.VN_SHIPPING.value:

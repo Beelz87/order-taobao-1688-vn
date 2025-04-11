@@ -30,6 +30,7 @@ class CRUDFulfillment(CRUDBase[Fulfillment, FulfillmentCreate, FulfillmentUpdate
         *,
         db_obj: Fulfillment,
         obj_in: Union[FulfillmentUpdate, Dict[str, Any]],
+        **kwargs: Any
     ) -> Fulfillment:
         if isinstance(obj_in, dict):
             update_data = obj_in

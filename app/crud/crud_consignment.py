@@ -1,6 +1,7 @@
 from datetime import datetime, UTC
 from typing import Union, Dict, Any, List
 
+from sqlalchemy import desc, asc
 from sqlalchemy.orm import Session
 
 from app import crud
@@ -81,6 +82,7 @@ class CRUDConsignment(CRUDBase[Consignment, ConsignmentCreate, ConsignmentUpdate
         *,
         db_obj: Consignment,
         obj_in: Union[ConsignmentUpdate, Dict[str, Any]],
+        **kwargs: Any
     ) -> Consignment:
         if isinstance(obj_in, dict):
             update_data = obj_in
@@ -97,8 +99,8 @@ class CRUDConsignment(CRUDBase[Consignment, ConsignmentCreate, ConsignmentUpdate
                 db.delete(code)
             db.commit()
 
-        if obj_in.foreign_shipping_code:
-            for code in obj_in.foreign_shipping_code:
+        if obj_in.foreign_shipment_codes:
+            for code in obj_in.foreign_shipment_codes:
                 db_obj_foreign_code = ConsignmentForeignShipmentCode(
                     consignment_id=db_obj.id,
                     foreign_shipment_code=code
@@ -110,6 +112,41 @@ class CRUDConsignment(CRUDBase[Consignment, ConsignmentCreate, ConsignmentUpdate
 
     def get_by_user_id(self, db: Session, *, user_id: int) -> List[Consignment]:
         return db.query(self.model).filter(Consignment.user_id == user_id).all()
+
+    def get_multi(
+        self, db: Session, *, skip: int = 0, limit: int = 100, filters: Dict[str, Any] = None,
+                                              order_by = "id", direction = "desc"
+    ) -> List[Consignment]:
+        query = db.query(self.model)
+        if filters:
+            created_at_start = filters.pop("created_at_start", None)
+            created_at_end = filters.pop("created_at_end", None)
+
+            for key, value in filters.items():
+                if hasattr(self.model, key):  # Ensure the key exists in the model
+                    query = query.filter(getattr(self.model, key) == value)
+                else:
+                    raise ValueError(f"Invalid filter key: {key}")
+
+            if created_at_start and created_at_end:
+                query = query.filter(
+                    self.model.created_at >= created_at_start,
+                    self.model.created_at <= created_at_end
+                )
+            elif created_at_start and not created_at_end:
+                query = query.filter(self.model.created_at >= created_at_start)
+            elif not created_at_start and created_at_end:
+                query = query.filter(self.model.created_at <= created_at_end)
+
+        try:
+            if direction.lower() == "desc":
+                query = query.order_by(desc(order_by))
+            else:
+                query = query.order_by(asc(order_by))
+        except Exception as e:
+            raise ValueError(f"Invalid order_by format: {order_by}") from e
+
+        return query.offset(skip).limit(limit).all()
 
 
 consignment = CRUDConsignment(Consignment)

@@ -27,6 +27,7 @@ class CRUDProductCategory(CRUDBase[ProductCategory, ProductCategoryCreate, Produ
         *,
         db_obj: ProductCategory,
         obj_in: Union[ProductCategoryUpdate, Dict[str, Any]],
+        **kwargs: Any
     ) -> ProductCategory:
         if isinstance(obj_in, dict):
             update_data = obj_in

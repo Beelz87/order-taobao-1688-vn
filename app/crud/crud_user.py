@@ -30,6 +30,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         *,
         db_obj: User,
         obj_in: Union[UserUpdate, Dict[str, Any]],
+        **kwargs: Any
     ) -> User:
         if isinstance(obj_in, dict):
             update_data = obj_in

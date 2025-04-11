@@ -27,6 +27,7 @@ class CRUDStore(CRUDBase[Store, StoreCreate, StoreUpdate]):
         *,
         db_obj: Store,
         obj_in: Union[StoreUpdate, Dict[str, Any]],
+        **kwargs: Any
     ) -> Store:
         if isinstance(obj_in, dict):
             update_data = obj_in

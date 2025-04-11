@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 
 from app import schemas, models, crud
 from app.api import deps
+from app.constants.general import CompareOperator
 from app.constants.role import Role
 from app.constants.shipment import ShipmentStatus, ShipmentFinanceStatus
 from app.schemas import ShipmentCreate
@@ -25,7 +26,8 @@ def read_consignments(
     id: int = None,
     code: str = None,
     store_id: int = None,
-    created_at: datetime = None,
+    created_at_start: datetime = None,
+    created_at_end: datetime = None,
     order_by: str = "id",
     direction: str = "desc",
     current_user: models.User = Security(
@@ -43,8 +45,10 @@ def read_consignments(
         filters["code"] = code
     if store_id is not None:
         filters["store_id"] = store_id
-    if created_at is not None:
-        filters["created_at"] = created_at
+    if created_at_start is not None:
+        filters["created_at_start"] = created_at_start
+    if created_at_end is not None:
+        filters["created_at_end"] = created_at_end
 
     #consignments = []
     #if current_user.user_role == Role.ADMIN or current_user.user_role == Role.SUPER_ADMIN:

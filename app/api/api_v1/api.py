@@ -1,5 +1,5 @@
 from app.api.api_v1.routers import accounts, auth, roles, user_roles, users, exchanges, stores, consignments, \
-    product_categories, deposit_bills, shipments, fulfillments
+    product_categories, deposit_bills, shipments, fulfillments, change_logs
 from fastapi import APIRouter
 
 api_router = APIRouter()
@@ -16,3 +16,4 @@ api_router.include_router(product_categories.router)
 api_router.include_router(deposit_bills.router)
 api_router.include_router(shipments.router)
 api_router.include_router(fulfillments.router)
+api_router.include_router(change_logs.router)
