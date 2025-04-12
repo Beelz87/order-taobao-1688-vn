@@ -72,6 +72,6 @@ def update_exchange(
             status_code=404,
             detail="The pair of exchange does not exist in the system.",
         )
-    exchange = crud.exchange.update(db, db_obj=exchange, obj_in=exchange_in)
+    exchange = crud.exchange.update(db, db_obj=exchange, obj_in=exchange_in, current_user_id=current_user.id)
 
     return Response(message="", data=exchange)

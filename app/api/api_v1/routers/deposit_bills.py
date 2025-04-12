@@ -70,6 +70,7 @@ def update_deposit_bill(
             status_code=404,
             detail="The deposit bill does not exist in the system.",
         )
-    deposit_bill = crud.deposit_bill.update(db, db_obj=deposit_bill, obj_in=deposit_bill_in)
+    deposit_bill = crud.deposit_bill.update(db, db_obj=deposit_bill, obj_in=deposit_bill_in,
+                                            current_user_id=current_user.id)
 
     return Response(message="", data=deposit_bill)
