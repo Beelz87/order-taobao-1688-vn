@@ -49,13 +49,14 @@ class CRUDExchange(CRUDBase[Exchange, ExchangeCreate, ExchangeUpdate]):
 
         changes = []
         for field, new_value in update_data.items():
-            old_value = getattr(db_obj, field)
-            if old_value != new_value:
-                changes.append({
-                    "field": field,
-                    "old": old_value,
-                    "new": new_value
-                })
+            if hasattr(db_obj, field):
+                old_value = getattr(db_obj, field)
+                if old_value != new_value:
+                    changes.append({
+                        "field": field,
+                        "old": old_value,
+                        "new": new_value
+                    })
 
         updated_obj =  super().update(db, db_obj=db_obj, obj_in=update_data)
 

@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import BaseModel
 
 
@@ -15,7 +17,12 @@ class ExchangeCreate(ExchangeBase):
     pass
 
 class ExchangeUpdate(BaseModel):
-    pass
+    description: Optional[str] = None
+    is_active: Optional[bool] = None
+    exchange_rate: Optional[float] = None
+
+    class Config:
+        from_attributes = True
 
 class ExchangeInDBBase(ExchangeBase):
     id: int

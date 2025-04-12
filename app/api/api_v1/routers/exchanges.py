@@ -56,6 +56,7 @@ def create_exchange(
 def update_exchange(
     *,
     db: Session = Depends(deps.get_db),
+    exchange_id: int,
     exchange_in: schemas.ExchangeUpdate,
     current_user: models.User = Security(
         deps.get_current_active_user,
@@ -65,8 +66,7 @@ def update_exchange(
     """
     Update exchange.
     """
-    exchange = crud.exchange.get_active_one_by_foreign_and_local_currency(db, foreign_currency=exchange_in.foreign_currency,
-                                                                      local_currency=exchange_in.local_currency)
+    exchange = crud.exchange.get(db, exchange_id)
     if not exchange:
         raise HTTPException(
             status_code=404,
