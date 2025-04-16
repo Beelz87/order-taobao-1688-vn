@@ -15,7 +15,7 @@ class CRUDExchange(CRUDBase[Exchange, ExchangeCreate, ExchangeUpdate]):
                                            Exchange.local_currency == local_currency,
                                            Exchange.is_active).first()
 
-    def create(self, db: Session, *, obj_in: ExchangeCreate) -> Exchange:
+    def create(self, db: Session, *, obj_in: ExchangeCreate, **kwargs) -> Exchange:
         db_obj = Exchange(
             name=obj_in.name,
             description=obj_in.description,

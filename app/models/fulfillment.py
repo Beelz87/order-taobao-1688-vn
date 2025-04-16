@@ -12,7 +12,10 @@ class Fulfillment(Base):
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
 
     consignment_id = Column(Integer(), ForeignKey("consignments.id"), nullable=False)
+    consignment = relationship("Consignment", back_populates="fulfillments")
+
     shipment_id = Column(Integer(), ForeignKey("shipments.id"), nullable=False)
+    shipment = relationship("Shipment", back_populates="fulfillment")
 
     customer_name = Column(String(255), nullable=False)
     customer_phone_number = Column(String(32), nullable=False)

@@ -8,7 +8,7 @@ from app.schemas.change_log import ChangeLogCreate
 
 
 class CRUDChangeLog(CRUDBase[ChangeLog, ChangeLogCreate, None]):
-    def create(self, db: Session, *, obj_in: ChangeLogCreate) -> ChangeLog:
+    def create(self, db: Session, *, obj_in: ChangeLogCreate, **kwargs) -> ChangeLog:
         db_obj = ChangeLog(
             user_id=obj_in.user_id,
             object_type=obj_in.object_type,

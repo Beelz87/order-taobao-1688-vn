@@ -12,9 +12,10 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
     def get_by_email(self, db: Session, *, email: str) -> Optional[User]:
         return db.query(self.model).filter(User.email == email).first()
 
-    def create(self, db: Session, *, obj_in: UserCreate) -> User:
+    def create(self, db: Session, *, obj_in: UserCreate, **kwargs) -> User:
         db_obj = User(
             email=obj_in.email,
+            user_code=obj_in.email.split("@")[0],
             hashed_password=get_password_hash(obj_in.password),
             full_name=obj_in.full_name,
             account_id=obj_in.account_id,
@@ -32,10 +33,17 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         obj_in: Union[UserUpdate, Dict[str, Any]],
         **kwargs: Any
     ) -> User:
+        if obj_in.user_code != db_obj.user_code:
+            if db_obj.is_user_code_edited:
+                raise ValueError("user_code is edited before and cannot be changed anymore.")
+
+            obj_in.is_user_code_edited = True
+
         if isinstance(obj_in, dict):
             update_data = obj_in
         else:
             update_data = obj_in.model_dump(exclude_unset=True)
+
         if "password" in update_data:
             hashed_password = get_password_hash(update_data["password"])
             del update_data["password"]

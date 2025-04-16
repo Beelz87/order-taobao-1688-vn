@@ -12,3 +12,4 @@ from .deposit_bill import DepositBill, DepositBillCreate, DepositBillInDB, Depos
 from .shipment import Shipment, ShipmentCreate, ShipmentInDB, ShipmentUpdate
 from .fulfillment import Fulfillment, FulfillmentCreate, FulfillmentInDB, FulfillmentUpdate
 from .change_log import ChangeLog, ChangeLogCreate, ChangeLogInDB
+from .user_address import UserAddress, UserAddressCreate, UserAddressInDB, UserAddressUpdate

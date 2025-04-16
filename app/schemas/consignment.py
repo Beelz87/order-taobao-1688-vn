@@ -10,9 +10,7 @@ class ConsignmentBase(BaseModel):
     user_id: int
     source_store_id: int
     dest_store_id: int
-    shipping_name: str
-    shipping_address: str
-    shipping_phone_number: str
+    user_address_id: int
     shipping_status: int
     store_status: int
     weight: float
@@ -24,24 +22,13 @@ class ConsignmentBase(BaseModel):
     wide_packaged: float
     length_packaged: float
 
-    contains_liquid: bool = False
-    is_fragile: bool = False
-    wooden_packaging_required: bool = False
-    insurance_required: bool = False
-    item_count_check_required: bool = False
-
-    contains_liquid_fee: float = 0.0
-    is_fragile_fee: float = 0.0
-    wooden_packaging_required_fee: float = 0.0
-    insurance_required_fee: float = 0.0
-    item_count_check_required_fee: float = 0.0
-
     number_of_packages: int
     domestic_shipping_fee: float = 0.0
-    product_category_id: int
+    product_category_id: Optional[int] = None
+    product_name: Optional[str] = None
 
     foreign_shipment_codes: List[str] = None
-    image_base64: str = None
+    image_base64: Optional[str] = None
 
 
 # Properties to receive via API on creation
@@ -89,7 +76,8 @@ class ConsignmentInDBBase(BaseModel):
 
     number_of_packages: int
     domestic_shipping_fee: float = 0.0
-    product_category_id: int
+    product_category_id: Optional[int] = None
+    product_name: Optional[str] = None
     code: str
     image_path: Optional[str] = None
 

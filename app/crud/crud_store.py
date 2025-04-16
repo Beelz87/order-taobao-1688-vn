@@ -8,7 +8,7 @@ from app.schemas.store import StoreCreate, StoreUpdate
 
 
 class CRUDStore(CRUDBase[Store, StoreCreate, StoreUpdate]):
-    def create(self, db: Session, *, obj_in: StoreCreate) -> Store:
+    def create(self, db: Session, *, obj_in: StoreCreate, **kwargs) -> Store:
         db_obj = Store(
             name=obj_in.name,
             description=obj_in.description,

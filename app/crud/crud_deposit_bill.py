@@ -13,7 +13,7 @@ class CRUDDepositBill(CRUDBase[DepositBill, DepositBillCreate, DepositBillUpdate
     def get_by_user_id(self, db: Session, *, user_id: int) -> Optional[DepositBill]:
         return db.query(self.model).filter(DepositBill.user_id == user_id).first()
 
-    def create(self, db: Session, *, obj_in: DepositBillCreate) -> DepositBill:
+    def create(self, db: Session, *, obj_in: DepositBillCreate, **kwargs) -> DepositBill:
         db_obj = DepositBill(
             user_id=obj_in.user_id,
             user_fullname=obj_in.user_fullname,

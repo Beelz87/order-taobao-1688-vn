@@ -8,7 +8,7 @@ from app.schemas.product_category import ProductCategoryCreate, ProductCategoryU
 
 
 class CRUDProductCategory(CRUDBase[ProductCategory, ProductCategoryCreate, ProductCategoryUpdate]):
-    def create(self, db: Session, *, obj_in: ProductCategoryCreate) -> ProductCategory:
+    def create(self, db: Session, *, obj_in: ProductCategoryCreate, **kwargs) -> ProductCategory:
         db_obj = ProductCategory(
             name=obj_in.name,
             description=obj_in.description,

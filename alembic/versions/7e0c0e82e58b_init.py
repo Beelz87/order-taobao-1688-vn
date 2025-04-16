@@ -1,8 +1,8 @@
 """init
 
-Revision ID: 58c108ae0077
+Revision ID: 7e0c0e82e58b
 Revises: 
-Create Date: 2025-04-04 19:03:43.703113
+Create Date: 2025-04-16 10:26:57.374448
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '58c108ae0077'
+revision = '7e0c0e82e58b'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -32,6 +32,20 @@ def upgrade():
     op.create_index(op.f('ix_accounts_id'), 'accounts', ['id'], unique=False)
     op.create_index(op.f('ix_accounts_name'), 'accounts', ['name'], unique=False)
     op.create_index(op.f('ix_accounts_plan_id'), 'accounts', ['plan_id'], unique=False)
+    op.create_table('change_logs',
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('object_type', sa.String(length=100), nullable=False),
+    sa.Column('object_id', sa.Integer(), nullable=False),
+    sa.Column('action', sa.String(length=50), nullable=False),
+    sa.Column('changes', sa.JSON(), nullable=False),
+    sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index(op.f('ix_change_logs_object_id'), 'change_logs', ['object_id'], unique=False)
+    op.create_index(op.f('ix_change_logs_user_id'), 'change_logs', ['user_id'], unique=False)
+    op.create_index('ix_object_type_object_id', 'change_logs', ['object_type', 'object_id'], unique=False)
+    op.create_index('ix_user_id_object_type', 'change_logs', ['user_id', 'object_type'], unique=False)
     op.create_table('exchanges',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('name', sa.String(length=255), nullable=False),
@@ -68,19 +82,24 @@ def upgrade():
     sa.Column('name', sa.String(length=255), nullable=True),
     sa.Column('description', sa.String(length=255), nullable=True),
     sa.Column('is_active', sa.Boolean(), nullable=True),
+    sa.Column('type_store', sa.Integer(), nullable=True),
+    sa.Column('code', sa.String(length=255), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('code')
     )
     op.create_index(op.f('ix_stores_id'), 'stores', ['id'], unique=False)
     op.create_index(op.f('ix_stores_name'), 'stores', ['name'], unique=False)
     op.create_table('users',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('full_name', sa.String(length=255), nullable=True),
+    sa.Column('user_code', sa.String(length=255), nullable=False),
     sa.Column('email', sa.String(length=100), nullable=False),
     sa.Column('phone_number', sa.String(length=13), nullable=True),
     sa.Column('hashed_password', sa.String(length=255), nullable=False),
     sa.Column('is_active', sa.Boolean(), nullable=True),
+    sa.Column('is_user_code_edited', sa.Boolean(), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
     sa.Column('account_id', sa.Integer(), nullable=False),
@@ -91,12 +110,15 @@ def upgrade():
     op.create_index(op.f('ix_users_full_name'), 'users', ['full_name'], unique=False)
     op.create_index(op.f('ix_users_id'), 'users', ['id'], unique=False)
     op.create_index(op.f('ix_users_phone_number'), 'users', ['phone_number'], unique=True)
+    op.create_index(op.f('ix_users_user_code'), 'users', ['user_code'], unique=True)
     op.create_table('consignments',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('shipping_name', sa.String(length=255), nullable=False),
     sa.Column('shipping_phone_number', sa.String(length=13), nullable=False),
-    sa.Column('store_id', sa.Integer(), nullable=False),
+    sa.Column('shipping_address', sa.String(length=2056), nullable=False),
+    sa.Column('source_store_id', sa.Integer(), nullable=False),
+    sa.Column('dest_store_id', sa.Integer(), nullable=False),
     sa.Column('shipping_status', sa.Integer(), nullable=False),
     sa.Column('store_status', sa.Integer(), nullable=False),
     sa.Column('weight', sa.Float(), nullable=False),
@@ -109,31 +131,23 @@ def upgrade():
     sa.Column('length_packaged', sa.Float(), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
-    sa.Column('shipping_address', sa.String(length=2056), nullable=False),
-    sa.Column('contains_liquid', sa.Boolean(), nullable=False),
-    sa.Column('is_fragile', sa.Boolean(), nullable=False),
-    sa.Column('wooden_packaging_required', sa.Boolean(), nullable=False),
-    sa.Column('insurance_required', sa.Boolean(), nullable=False),
-    sa.Column('item_count_check_required', sa.Boolean(), nullable=False),
-    sa.Column('contains_liquid_fee', sa.Float(), nullable=False),
-    sa.Column('is_fragile_fee', sa.Float(), nullable=False),
-    sa.Column('wooden_packaging_required_fee', sa.Float(), nullable=False),
-    sa.Column('insurance_required_fee', sa.Float(), nullable=False),
-    sa.Column('item_count_check_required_fee', sa.Float(), nullable=False),
     sa.Column('image_path', sa.String(length=255), nullable=True),
-    sa.Column('product_category_id', sa.Integer(), nullable=False),
+    sa.Column('product_name', sa.String(length=255), nullable=True),
+    sa.Column('product_category_id', sa.Integer(), nullable=True),
     sa.Column('number_of_packages', sa.Integer(), nullable=False),
     sa.Column('domestic_shipping_fee', sa.Float(), nullable=False),
-    sa.Column('code', sa.UUID(), nullable=False),
+    sa.Column('code', sa.String(length=255), nullable=False),
+    sa.ForeignKeyConstraint(['dest_store_id'], ['stores.id'], ),
     sa.ForeignKeyConstraint(['product_category_id'], ['product_categories.id'], ),
-    sa.ForeignKeyConstraint(['store_id'], ['stores.id'], ),
+    sa.ForeignKeyConstraint(['source_store_id'], ['stores.id'], ),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_consignments_code'), 'consignments', ['code'], unique=False)
     op.create_index(op.f('ix_consignments_created_at'), 'consignments', ['created_at'], unique=False)
+    op.create_index(op.f('ix_consignments_dest_store_id'), 'consignments', ['dest_store_id'], unique=False)
     op.create_index(op.f('ix_consignments_id'), 'consignments', ['id'], unique=False)
-    op.create_index(op.f('ix_consignments_store_id'), 'consignments', ['store_id'], unique=False)
+    op.create_index(op.f('ix_consignments_source_store_id'), 'consignments', ['source_store_id'], unique=False)
     op.create_table('deposit_bills',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=True),
@@ -147,6 +161,18 @@ def upgrade():
     )
     op.create_index(op.f('ix_deposit_bills_created_at'), 'deposit_bills', ['created_at'], unique=False)
     op.create_index(op.f('ix_deposit_bills_id'), 'deposit_bills', ['id'], unique=False)
+    op.create_table('user_addresses',
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=True),
+    sa.Column('name', sa.String(length=255), nullable=False),
+    sa.Column('phone_number', sa.String(length=13), nullable=False),
+    sa.Column('address', sa.String(length=2056), nullable=False),
+    sa.Column('is_active', sa.Boolean(), nullable=True),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index(op.f('ix_user_addresses_id'), 'user_addresses', ['id'], unique=False)
+    op.create_index(op.f('ix_user_addresses_user_id'), 'user_addresses', ['user_id'], unique=False)
     op.create_table('user_roles',
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('role_id', sa.Integer(), nullable=False),
@@ -155,11 +181,33 @@ def upgrade():
     sa.PrimaryKeyConstraint('user_id', 'role_id'),
     sa.UniqueConstraint('user_id', 'role_id', name='unique_user_role')
     )
+    op.create_table('consignment_foreign_shipment_codes',
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('consignment_id', sa.Integer(), nullable=False),
+    sa.Column('foreign_shipment_code', sa.String(length=255), nullable=False),
+    sa.ForeignKeyConstraint(['consignment_id'], ['consignments.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index(op.f('ix_consignment_foreign_shipment_codes_consignment_id'), 'consignment_foreign_shipment_codes', ['consignment_id'], unique=False)
+    op.create_index(op.f('ix_consignment_foreign_shipment_codes_foreign_shipment_code'), 'consignment_foreign_shipment_codes', ['foreign_shipment_code'], unique=False)
+    op.create_index(op.f('ix_consignment_foreign_shipment_codes_id'), 'consignment_foreign_shipment_codes', ['id'], unique=False)
     op.create_table('shipments',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('consignment_id', sa.Integer(), nullable=False),
+    sa.Column('contains_liquid', sa.Boolean(), nullable=False),
+    sa.Column('is_fragile', sa.Boolean(), nullable=False),
+    sa.Column('wooden_packaging_required', sa.Boolean(), nullable=False),
+    sa.Column('insurance_required', sa.Boolean(), nullable=False),
+    sa.Column('item_count_check_required', sa.Boolean(), nullable=False),
+    sa.Column('contains_liquid_fee', sa.Float(), nullable=False),
+    sa.Column('is_fragile_fee', sa.Float(), nullable=False),
+    sa.Column('wooden_packaging_required_fee', sa.Float(), nullable=False),
+    sa.Column('insurance_required_fee', sa.Float(), nullable=False),
+    sa.Column('item_count_check_required_fee', sa.Float(), nullable=False),
     sa.Column('shipment_status', sa.Integer(), nullable=False),
     sa.Column('finance_status', sa.Integer(), nullable=False),
+    sa.Column('note', sa.Text(), nullable=True),
+    sa.Column('code', sa.String(length=128), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['consignment_id'], ['consignments.id'], ),
@@ -195,15 +243,24 @@ def downgrade():
     op.drop_index(op.f('ix_shipments_id'), table_name='shipments')
     op.drop_index(op.f('ix_shipments_created_at'), table_name='shipments')
     op.drop_table('shipments')
+    op.drop_index(op.f('ix_consignment_foreign_shipment_codes_id'), table_name='consignment_foreign_shipment_codes')
+    op.drop_index(op.f('ix_consignment_foreign_shipment_codes_foreign_shipment_code'), table_name='consignment_foreign_shipment_codes')
+    op.drop_index(op.f('ix_consignment_foreign_shipment_codes_consignment_id'), table_name='consignment_foreign_shipment_codes')
+    op.drop_table('consignment_foreign_shipment_codes')
     op.drop_table('user_roles')
+    op.drop_index(op.f('ix_user_addresses_user_id'), table_name='user_addresses')
+    op.drop_index(op.f('ix_user_addresses_id'), table_name='user_addresses')
+    op.drop_table('user_addresses')
     op.drop_index(op.f('ix_deposit_bills_id'), table_name='deposit_bills')
     op.drop_index(op.f('ix_deposit_bills_created_at'), table_name='deposit_bills')
     op.drop_table('deposit_bills')
-    op.drop_index(op.f('ix_consignments_store_id'), table_name='consignments')
+    op.drop_index(op.f('ix_consignments_source_store_id'), table_name='consignments')
     op.drop_index(op.f('ix_consignments_id'), table_name='consignments')
+    op.drop_index(op.f('ix_consignments_dest_store_id'), table_name='consignments')
     op.drop_index(op.f('ix_consignments_created_at'), table_name='consignments')
     op.drop_index(op.f('ix_consignments_code'), table_name='consignments')
     op.drop_table('consignments')
+    op.drop_index(op.f('ix_users_user_code'), table_name='users')
     op.drop_index(op.f('ix_users_phone_number'), table_name='users')
     op.drop_index(op.f('ix_users_id'), table_name='users')
     op.drop_index(op.f('ix_users_full_name'), table_name='users')
@@ -220,6 +277,11 @@ def downgrade():
     op.drop_index(op.f('ix_exchanges_name'), table_name='exchanges')
     op.drop_index(op.f('ix_exchanges_id'), table_name='exchanges')
     op.drop_table('exchanges')
+    op.drop_index('ix_user_id_object_type', table_name='change_logs')
+    op.drop_index('ix_object_type_object_id', table_name='change_logs')
+    op.drop_index(op.f('ix_change_logs_user_id'), table_name='change_logs')
+    op.drop_index(op.f('ix_change_logs_object_id'), table_name='change_logs')
+    op.drop_table('change_logs')
     op.drop_index(op.f('ix_accounts_plan_id'), table_name='accounts')
     op.drop_index(op.f('ix_accounts_name'), table_name='accounts')
     op.drop_index(op.f('ix_accounts_id'), table_name='accounts')

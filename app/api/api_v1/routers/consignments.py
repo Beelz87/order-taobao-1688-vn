@@ -9,7 +9,6 @@ from sqlalchemy.orm import Session
 
 from app import schemas, models, crud
 from app.api import deps
-from app.constants.general import CompareOperator
 from app.constants.role import Role
 from app.constants.shipment import ShipmentStatus, ShipmentFinanceStatus
 from app.schemas import ShipmentCreate
@@ -50,14 +49,19 @@ def read_consignments(
     if created_at_end is not None:
         filters["created_at_end"] = created_at_end
 
-    #consignments = []
-    #if current_user.user_role == Role.ADMIN or current_user.user_role == Role.SUPER_ADMIN:
-    #    consignments = crud.consignment.get_multi(db, skip=skip, limit=limit, filters=filters)
-    #elif current_user.user_role == Role.USER:
-    #    filters["user_id"] = current_user.id
-    #    consignments = crud.consignment.get_multi(db, skip=skip, limit=limit, filters=filters)
-    consignments = crud.consignment.get_multi(db, skip=skip, limit=limit, filters=filters,
-                                              order_by=order_by, direction=direction)
+    consignments = []
+    if (current_user.user_role.role.name == Role.ADMIN["name"] or
+            current_user.user_role.role.name == Role.SUPER_ADMIN["name"]):
+       consignments = crud.consignment.get_multi(db, skip=skip, limit=limit, filters=filters,
+                                                 order_by=order_by, direction=direction)
+    elif current_user.user_role.role.name == Role.USER["name"]:
+       filters["user_id"] = current_user.id
+       consignments = crud.consignment.get_multi(db, skip=skip, limit=limit, filters=filters,
+                                                 order_by=order_by, direction=direction)
+
+    # consignments = crud.consignment.get_multi(db, skip=skip, limit=limit, filters=filters,
+    #                                           order_by=order_by, direction=direction)
+
     return Response(message="", data=consignments)
 
 
@@ -108,10 +112,26 @@ def create_consignment(
         consignment_in.image_path = image_path  # full relative path
     consignment = crud.consignment.create(db, obj_in=consignment_in)
 
-    shipment_in = ShipmentCreate(consignment_id=consignment.id,
-                                 shipment_status=ShipmentStatus.FOREIGN_SHIPPING.value,
-                                 finance_status=ShipmentFinanceStatus.NOT_APPROVED.value)
-    crud.shipment.create(db, obj_in=shipment_in)
+    if consignment_in.foreign_shipment_codes:
+        for code in consignment_in.foreign_shipment_codes:
+            shipment_in = ShipmentCreate(consignment_id=consignment.id,
+                                         shipment_status=ShipmentStatus.FOREIGN_SHIPPING.value,
+                                         finance_status=ShipmentFinanceStatus.NOT_APPROVED.value,
+                                         contains_liquid=consignment_in.contains_liquid,
+                                         is_fragile=consignment_in.is_fragile,
+                                         wooden_packaging_required=consignment_in.wooden_packaging_required,
+                                         insurance_required=consignment_in.insurance_required,
+                                         item_count_check_required=consignment_in.item_count_check_required,
+                                         contains_liquid_fee=consignment_in.contains_liquid_fee,
+                                         is_fragile_fee=consignment_in.is_fragile_fee,
+                                         wooden_packaging_required_fee=consignment_in.wooden_packaging_required_fee,
+                                         insurance_required_fee=consignment_in.insurance_required_fee,
+                                         item_count_check_required_fee=consignment_in.item_count_check_required_fee,
+                                         code=code,
+                                         note=consignment_in.note
+                                     )
+            crud.shipment.create(db, obj_in=shipment_in)
+
     consignment.image_path = consignment_in.image_path
     return Response(message="", data=consignment)
 
@@ -143,6 +163,33 @@ def update_consignment(
             detail="You do not have permission to perform this action."
         )
 
+    if consignment_in.foreign_shipment_codes:
+        if not crud.shipment.remove_by_consignment_id(db, consignment_id=consignment.id):
+            raise HTTPException(
+                status_code=400,
+                detail="Failed to remove existing foreign shipment codes."
+            )
+
     consignment = crud.consignment.update(db, db_obj=consignment, obj_in=consignment_in)
+
+    if consignment_in.foreign_shipment_codes:
+        for code in consignment_in.foreign_shipment_codes:
+            shipment_in = ShipmentCreate(consignment_id=consignment.id,
+                                         shipment_status=ShipmentStatus.FOREIGN_SHIPPING.value,
+                                         finance_status=ShipmentFinanceStatus.NOT_APPROVED.value,
+                                         contains_liquid=consignment_in.contains_liquid,
+                                         is_fragile=consignment_in.is_fragile,
+                                         wooden_packaging_required=consignment_in.wooden_packaging_required,
+                                         insurance_required=consignment_in.insurance_required,
+                                         item_count_check_required=consignment_in.item_count_check_required,
+                                         contains_liquid_fee=consignment_in.contains_liquid_fee,
+                                         is_fragile_fee=consignment_in.is_fragile_fee,
+                                         wooden_packaging_required_fee=consignment_in.wooden_packaging_required_fee,
+                                         insurance_required_fee=consignment_in.insurance_required_fee,
+                                         item_count_check_required_fee=consignment_in.item_count_check_required_fee,
+                                         code=code,
+                                         note=consignment_in.note
+                                     )
+            crud.shipment.create(db, obj_in=shipment_in)
 
     return Response(message="", data=consignment)

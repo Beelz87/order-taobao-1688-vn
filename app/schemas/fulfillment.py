@@ -3,7 +3,7 @@ from typing import Optional
 
 from pydantic import BaseModel
 
-from app.schemas import Consignment
+from app.schemas import Consignment, Shipment
 
 
 class FulfillmentBase(BaseModel):
@@ -15,9 +15,7 @@ class FulfillmentBase(BaseModel):
 
 # Properties to receive via API on creation
 class FulfillmentCreate(FulfillmentBase):
-    customer_name: str
-    customer_phone_number: str
-    customer_address: str
+    pass
 
 
 # Properties to receive via API on update
@@ -37,9 +35,12 @@ class FulfillmentInDBBase(FulfillmentBase):
 
 # Additional properties to return via API
 class Fulfillment(FulfillmentInDBBase):
-    customer_name: str
-    customer_phone_number: str
-    customer_address: str
+    customer_name: Optional[str] = None
+    customer_phone: Optional[str] = None
+    customer_address: Optional[str] = None
+
+    shipment: Shipment = None
+    consignment: Consignment = None
 
 
 # Additional properties stored in DB

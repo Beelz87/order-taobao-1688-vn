@@ -18,16 +18,23 @@ class UserBase(BaseModel):
 # Properties to receive via API on creation
 class UserCreate(UserBase):
     password: str
+    user_code: Optional[str] = None
+    is_user_code_edited: Optional[bool] = False
 
 
 # Properties to receive via API on update
 class UserUpdate(UserBase):
-    pass
+    user_code: Optional[str] = None
+
+    class Config:
+        from_attributes = True
 
 
 class UserInDBBase(UserBase):
     id: int
     user_role: Optional[UserRole]
+    user_code: Optional[str] = None
+    is_user_code_edited: Optional[bool] = False
     created_at: datetime
     updated_at: datetime
 

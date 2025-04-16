@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     FIRST_SUPER_ADMIN_EMAIL: str
     FIRST_SUPER_ADMIN_PASSWORD: str
     FIRST_SUPER_ADMIN_ACCOUNT_NAME: str
+    FIRST_SUPER_ADMIN_USER_CODE: str
 
     DB_HOST: str
     DB_PORT: int

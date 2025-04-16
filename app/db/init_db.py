@@ -32,6 +32,8 @@ def init_db(db: Session) -> None:
             password=settings.FIRST_SUPER_ADMIN_PASSWORD,
             full_name=settings.FIRST_SUPER_ADMIN_EMAIL,
             account_id=account.id,
+            user_code=settings.FIRST_SUPER_ADMIN_USER_CODE,
+            is_user_code_edited=False
         )
         user = crud.user.create(db, obj_in=user_in)
 

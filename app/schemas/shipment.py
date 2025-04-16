@@ -11,6 +11,21 @@ class ShipmentBase(BaseModel):
     shipment_status: int
     finance_status: int
 
+    contains_liquid: bool = False
+    is_fragile: bool = False
+    wooden_packaging_required: bool = False
+    insurance_required: bool = False
+    item_count_check_required: bool = False
+
+    contains_liquid_fee: float = 0.0
+    is_fragile_fee: float = 0.0
+    wooden_packaging_required_fee: float = 0.0
+    insurance_required_fee: float = 0.0
+    item_count_check_required_fee: float = 0.0
+
+    code: str
+    note: Optional[str] = None
+
 
 # Properties to receive via API on creation
 class ShipmentCreate(ShipmentBase):

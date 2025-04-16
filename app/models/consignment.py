@@ -55,22 +55,10 @@ class Consignment(Base):
         onupdate=datetime.now(UTC),
     )
 
-    contains_liquid = Column(Boolean(), nullable=False, default=False)
-    is_fragile = Column(Boolean(), nullable=False, default=False)
-    wooden_packaging_required = Column(Boolean(), nullable=False, default=False)
-    insurance_required = Column(Boolean(), nullable=False, default=False)
-    item_count_check_required = Column(Boolean(), nullable=False, default=False)
-
-    contains_liquid_fee = Column(Float(), nullable=False, default=0.0)
-    is_fragile_fee = Column(Float(), nullable=False, default=0.0)
-    wooden_packaging_required_fee = Column(Float(), nullable=False, default=0.0)
-    insurance_required_fee = Column(Float(), nullable=False, default=0.0)
-    item_count_check_required_fee = Column(Float(), nullable=False, default=0.0)
-
     image_path = Column(String(255), nullable=True)
-
+    product_name = Column(String(255), nullable=True)
     product_category_id = Column(
-        Integer(), ForeignKey("product_categories.id"), nullable=False
+        Integer(), ForeignKey("product_categories.id"), nullable=True
     )
     product_category = relationship("ProductCategory", back_populates="consignments")
 
@@ -78,6 +66,7 @@ class Consignment(Base):
     domestic_shipping_fee = Column(Float(), nullable=False, default=0.0)
     code = Column(String(255), nullable=False, index=True)
 
-    shipment = relationship("Shipment", back_populates="consignment")
+    shipments = relationship("Shipment", back_populates="consignment")
     foreign_shipment_codes = relationship("ConsignmentForeignShipmentCode", back_populates="consignment")
+    fulfillments = relationship("Fulfillment", back_populates="consignment")
 

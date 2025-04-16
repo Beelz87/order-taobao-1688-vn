@@ -10,11 +10,22 @@ from app.schemas import ShipmentCreate, ShipmentUpdate
 
 
 class CRUDShipment(CRUDBase[Shipment, ShipmentCreate, ShipmentUpdate]):
-    def create(self, db: Session, *, obj_in: ShipmentCreate) -> Shipment:
+    def create(self, db: Session, *, obj_in: ShipmentCreate, **kwargs) -> Shipment:
         db_obj = Shipment(
             consignment_id=obj_in.consignment_id,
             shipment_status=obj_in.shipment_status,
-            finance_status=obj_in.finance_status
+            finance_status=obj_in.finance_status,
+            contains_liquid=obj_in.contains_liquid,
+            is_fragile=obj_in.is_fragile,
+            wooden_packaging_required=obj_in.wooden_packaging_required,
+            insurance_required=obj_in.insurance_required,
+            item_count_check_required=obj_in.item_count_check_required,
+            contains_liquid_fee=obj_in.contains_liquid_fee,
+            is_fragile_fee=obj_in.is_fragile_fee,
+            wooden_packaging_required_fee=obj_in.wooden_packaging_required_fee,
+            insurance_required_fee=obj_in.insurance_required_fee,
+            item_count_check_required_fee=obj_in.item_count_check_required_fee,
+            note=obj_in.note
         )
         db.add(db_obj)
         db.commit()
@@ -65,6 +76,12 @@ class CRUDShipment(CRUDBase[Shipment, ShipmentCreate, ShipmentUpdate]):
 
     def get_by_user_id(self, db: Session, *, user_id: int) -> List[Shipment]:
         return db.query(self.model).filter(Shipment.user_id == user_id).all()
+
+    def remove_by_consignment_id(self, db: Session, *, consignment_id: int) -> bool:
+        db.query(self.model).filter(Shipment.consignment_id == consignment_id).delete()
+        db.commit()
+
+        return True
 
 
 shipment = CRUDShipment(Shipment)

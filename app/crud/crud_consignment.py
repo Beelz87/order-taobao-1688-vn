@@ -12,7 +12,7 @@ from app.schemas.consignment import ConsignmentUpdate, ConsignmentCreate
 
 
 class CRUDConsignment(CRUDBase[Consignment, ConsignmentCreate, ConsignmentUpdate]):
-    def create(self, db: Session, *, obj_in: ConsignmentCreate) -> Consignment:
+    def create(self, db: Session, *, obj_in: ConsignmentCreate, **kwargs) -> Consignment:
         source_store = crud.store.get(db, id=obj_in.source_store_id)
         if not source_store:
             raise ValueError(f"Store with id {obj_in.source_store} does not exist.")
@@ -21,17 +21,19 @@ class CRUDConsignment(CRUDBase[Consignment, ConsignmentCreate, ConsignmentUpdate
         if not dest_store:
             raise ValueError(f"Store with id {obj_in.dest_store} does not exist.")
 
-        product_category_code = obj_in.product_category_id
-        if product_category_code > 10 and product_category_code < 100:
-            product_category_code = f"0{obj_in.product_category_id}"
-        elif product_category_code <10:
-            product_category_code = f"00{obj_in.product_category_id}"
-        code = f"{source_store.code}{dest_store.code}{product_category_code}{000}{round(datetime.now(UTC).timestamp() * 1000)}"
+        code = f"{source_store.code}-{dest_store.code}-{obj_in.user_id}{round(datetime.now(UTC).timestamp() * 1000)}"
+
+        user_address = crud.user_address.get(db, id=obj_in.user_address_id)
+        if not user_address:
+            raise ValueError(f"User address with id {obj_in.user_address_id} does not exist.")
+        elif user_address.user_id != obj_in.user_id:
+            raise ValueError(f"User address with id {obj_in.user_address_id} does not belong to user with id {obj_in.user_id}.")
 
         db_obj = Consignment(
             user_id=obj_in.user_id,
-            shipping_name=obj_in.shipping_name,
-            shipping_phone_number=obj_in.shipping_phone_number,
+            shipping_name=user_address.name,
+            shipping_phone_number=user_address.phone_number,
+            shipping_address=user_address.address,
             source_store_id=obj_in.source_store_id,
             dest_store_id=obj_in.dest_store_id,
             shipping_status=obj_in.shipping_status,
@@ -44,19 +46,9 @@ class CRUDConsignment(CRUDBase[Consignment, ConsignmentCreate, ConsignmentUpdate
             height_packaged=obj_in.height_packaged,
             wide_packaged=obj_in.wide_packaged,
             length_packaged=obj_in.length_packaged,
-            shipping_address=obj_in.shipping_address,
-            contains_liquid=obj_in.contains_liquid,
-            is_fragile=obj_in.is_fragile,
-            wooden_packaging_required=obj_in.wooden_packaging_required,
-            insurance_required=obj_in.insurance_required,
-            item_count_check_required=obj_in.item_count_check_required,
-            contains_liquid_fee=obj_in.contains_liquid_fee,
-            is_fragile_fee=obj_in.is_fragile_fee,
-            wooden_packaging_required_fee=obj_in.wooden_packaging_required_fee,
-            insurance_required_fee=obj_in.insurance_required_fee,
-            item_count_check_required_fee=obj_in.item_count_check_required_fee,
             image_path=obj_in.image_path,
             product_category_id=obj_in.product_category_id,
+            product_name=obj_in.product_name,
             number_of_packages=obj_in.number_of_packages,
             domestic_shipping_fee=obj_in.domestic_shipping_fee,
             code=code
@@ -84,10 +76,23 @@ class CRUDConsignment(CRUDBase[Consignment, ConsignmentCreate, ConsignmentUpdate
         obj_in: Union[ConsignmentUpdate, Dict[str, Any]],
         **kwargs: Any
     ) -> Consignment:
+
         if isinstance(obj_in, dict):
             update_data = obj_in
         else:
             update_data = obj_in.model_dump(exclude_unset=True)
+
+
+        user_address = crud.user_address.get(db, id=obj_in.user_address_id)
+        if not user_address:
+            raise ValueError(f"User address with id {obj_in.user_address_id} does not exist.")
+        elif user_address.user_id != obj_in.user_id:
+            raise ValueError(
+                f"User address with id {obj_in.user_address_id} does not belong to user with id {obj_in.user_id}.")
+
+        update_data["shipping_name"] = user_address.name
+        update_data["shipping_phone_number"] = user_address.phone_number
+        update_data["shipping_address"] = user_address.address
 
         updated_data = super().update(db, db_obj=db_obj, obj_in=update_data)
 
