@@ -75,7 +75,7 @@ def update_deposit_bill(
     deposit_bill = crud.deposit_bill.update(db, db_obj=deposit_bill, obj_in=deposit_bill_in,
                                             current_user_id=current_user.id)
 
-    if deposit_bill.status == DepositStatus.APPROVED:
+    if deposit_bill.status == DepositStatus.APPROVED.value:
         user_finance = crud.user_finance.get_by_user_id(db, user_id=deposit_bill.user_id)
         if not user_finance:
             raise HTTPException(
