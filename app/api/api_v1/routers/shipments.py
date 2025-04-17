@@ -124,7 +124,7 @@ def update_shipment(
 
         fulfillment_in = schemas.FulfillmentCreate(
             customer_name=user_address.name,
-            customer_phone=user_address.phone_number,
+            customer_phone_number=user_address.phone_number,
             customer_address=user_address.address,
             consignment_id=db_shipment.consignment_id,
             shipment_id=shipment_id,

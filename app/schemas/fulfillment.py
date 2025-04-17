@@ -12,7 +12,7 @@ class FulfillmentBase(BaseModel):
     status: int
     shipping_type: int
     customer_name: Optional[str] = None
-    customer_phone: Optional[str] = None
+    customer_phone_number: Optional[str] = None
     customer_address: Optional[str] = None
 
 

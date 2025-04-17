@@ -11,6 +11,9 @@ from app.schemas import FulfillmentCreate, FulfillmentUpdate
 class CRUDFulfillment(CRUDBase[Fulfillment, FulfillmentCreate, FulfillmentUpdate]):
     def create(self, db: Session, *, obj_in: FulfillmentCreate, **kwargs) -> Fulfillment:
         db_obj = Fulfillment(
+            customer_name=obj_in.customer_name,
+            customer_phone_number=obj_in.customer_phone_number,
+            customer_address=obj_in.customer_address,
             consignment_id=obj_in.consignment_id,
             shipment_id=obj_in.shipment_id,
             status=obj_in.status,
