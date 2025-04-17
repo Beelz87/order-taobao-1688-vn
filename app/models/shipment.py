@@ -32,6 +32,8 @@ class Shipment(Base):
     note = Column(Text(), nullable=True)
     code = Column(String(128), nullable=False, default="")
 
+    shipping_fee = Column(Float(), nullable=False, default=0.0)
+
     created_at = Column(DateTime, index=True, default=datetime.now(UTC))
     updated_at = Column(
         DateTime,

@@ -61,7 +61,7 @@ def create_user_addresses(
     """
     final_user_id = get_user_id_from_role(current_user, user_id)
 
-    user_addresses = crud.user_address.create_bulk(db, addresses_in=addresses_in, user_id=final_user_id)
+    user_addresses = crud.user_address.create(db, addresses_in=addresses_in, user_id=final_user_id)
 
     return Response(message="", data=user_addresses)
 

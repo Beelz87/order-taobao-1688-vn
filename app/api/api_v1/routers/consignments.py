@@ -128,7 +128,8 @@ def create_consignment(
                                          insurance_required_fee=consignment_in.insurance_required_fee,
                                          item_count_check_required_fee=consignment_in.item_count_check_required_fee,
                                          code=code,
-                                         note=consignment_in.note
+                                         note=consignment_in.note,
+                                         shipping_fee=0.0
                                      )
             crud.shipment.create(db, obj_in=shipment_in)
 

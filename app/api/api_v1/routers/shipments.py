@@ -80,8 +80,20 @@ def update_shipment(
     shipment = crud.shipment.update(db, db_obj=db_shipment, obj_in=shipment_in, current_user_id=current_user.id)
     shipment.consignment = crud.consignment.get(db, id=shipment.consignment_id)
 
-    if (shipment.shipment_status == ShipmentStatus.VN_RECEIVED.value and
+    if (db_shipment.shipment_status == ShipmentStatus.VN_RECEIVED.value and
             shipment_in.shipment_status == ShipmentStatus.VN_SHIPMENT_REQUESTED.value):
+        user_finance = crud.user_finance.get_by_user_id(db, user_id=db_shipment.user_id)
+        if not user_finance:
+            raise HTTPException(
+                status_code=404,
+                detail="User finance does not exist in the system."
+            )
+        elif user_finance.balance < shipment.cod_amount:
+            raise HTTPException(
+                status_code=400,
+                detail="Not enough balance to create fulfillment."
+            )
+
         fulfillment_in = schemas.FulfillmentCreate(
             consignment_id=shipment.consignment_id,
             shipment_id=shipment.id,
@@ -89,8 +101,11 @@ def update_shipment(
             shipping_type=FulfillmentShippingType.BUS_SHIPMENT.value
         )
         crud.fulfillment.create(db, obj_in=fulfillment_in)
-    # elif (shipment_in.shipment_status == ShipmentStatus.VN_SHIPMENT_REQUESTED.value and
-    #       shipment_in.shipment_status == ShipmentStatus.VN_SHIPPED.value):
-    #     # tru tien o day
+
+        new_balance = user_finance.balance - shipment.shipping_fee
+        user_finance_in = schemas.UserFinanceUpdate(
+            balance=new_balance
+        )
+        crud.user_finance.update(db, db_obj=user_finance, obj_in=user_finance_in)
 
     return Response(message="", data=shipment)

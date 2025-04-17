@@ -15,7 +15,7 @@ class CRUDConsignment(CRUDBase[Consignment, ConsignmentCreate, ConsignmentUpdate
     def create(self, db: Session, *, obj_in: ConsignmentCreate, **kwargs) -> Consignment:
         source_store = crud.store.get(db, id=obj_in.source_store_id)
         if not source_store:
-            raise ValueError(f"Store with id {obj_in.source_store} does not exist.")
+            raise ValueError(f"Store with id {obj_in.source_store_id} does not exist.")
 
         dest_store = crud.store.get(db, id=obj_in.dest_store_id)
         if not dest_store:

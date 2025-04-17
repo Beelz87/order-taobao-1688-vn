@@ -11,3 +11,4 @@ from .crud_shipment import shipment
 from .crud_fulfillment import fulfillment
 from .crud_change_log import change_log
 from .crud_user_address import user_address
+from .crud_user_finance import user_finance

@@ -1,8 +1,9 @@
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 
 from pydantic import BaseModel, EmailStr
 
+from app.schemas import UserAddress, UserFinance
 from app.schemas.user_role import UserRole
 
 
@@ -33,6 +34,8 @@ class UserUpdate(UserBase):
 class UserInDBBase(UserBase):
     id: int
     user_role: Optional[UserRole]
+    user_addresses: Optional[List[UserAddress]] = None
+    user_finance: Optional[UserFinance] = None
     user_code: Optional[str] = None
     is_user_code_edited: Optional[bool] = False
     created_at: datetime

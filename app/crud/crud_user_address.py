@@ -18,7 +18,7 @@ class CRUDUserAddress(CRUDBase[UserAddress, UserAddressCreate, UserAddressUpdate
             name=obj_in.name,
             phone_number=obj_in.phone_number,
             address=obj_in.address,
-            is_active=obj_in.is_active if obj_in.is_active is not None else True,
+            is_active=obj_in.is_active if obj_in.is_active is not None else True
         )
         db.add(db_obj)
         db.commit()

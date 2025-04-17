@@ -9,3 +9,4 @@ from .fulfillment import Fulfillment
 from .consignment_foreign_shipment_code import ConsignmentForeignShipmentCode
 from .change_log import ChangeLog
 from .user_address import UserAddress
+from .user_finance import UserFinance
