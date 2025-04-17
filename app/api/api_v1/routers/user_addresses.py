@@ -14,9 +14,9 @@ def get_user_id_from_role(
     current_user: models.User,
     requested_user_id: Optional[int]
 ) -> int:
-    if current_user.user_role == Role.USER:
+    if current_user.user_role.role.name == Role.USER["name"]:
         return current_user.id
-    elif current_user.user_role in [Role.ADMIN, Role.SUPER_ADMIN]:
+    elif current_user.user_role.role.name in [Role.ADMIN["name"], Role.SUPER_ADMIN["name"]]:
         if not requested_user_id:
             raise HTTPException(status_code=400, detail="user_id is required for admins")
         return requested_user_id
@@ -57,7 +57,7 @@ def create_user_addresses(
     ),
 ) -> Any:
     """
-    Create new user addresses in bulk.
+    Create new user address.
     """
     final_user_id = get_user_id_from_role(current_user, user_id)
 
@@ -65,7 +65,7 @@ def create_user_addresses(
 
     return Response(message="", data=user_addresses)
 
-@router.patch("/{user_address_id}", response_model=Response[schemas.UserAddress])
+@router.put("/{user_address_id}", response_model=Response[schemas.UserAddress])
 def update_user_address(
     *,
     db: Session = Depends(deps.get_db),

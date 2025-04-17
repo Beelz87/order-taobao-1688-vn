@@ -78,7 +78,7 @@ def create_consignment(
     """
     Create new consignment with optional image (base64).
     """
-    if current_user.user_role == Role.USER:
+    if current_user.user_role.role.name == Role.USER["name"]:
         consignment_in.user_id = current_user.id
 
     if consignment_in.image_base64:

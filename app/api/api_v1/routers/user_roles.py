@@ -41,9 +41,7 @@ def update_user_role(
     current_user: models.User = Security(
         deps.get_current_active_user,
         scopes=[
-            Role.ADMIN["name"],
-            Role.SUPER_ADMIN["name"],
-            Role.ACCOUNT_ADMIN["name"],
+            Role.SUPER_ADMIN["name"]
         ],
     ),
 ) -> Any:
