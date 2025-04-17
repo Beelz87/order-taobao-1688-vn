@@ -117,19 +117,7 @@ def create_consignment(
             shipment_in = ShipmentCreate(consignment_id=consignment.id,
                                          shipment_status=ShipmentStatus.FOREIGN_SHIPPING.value,
                                          finance_status=ShipmentFinanceStatus.NOT_APPROVED.value,
-                                         contains_liquid=consignment_in.contains_liquid,
-                                         is_fragile=consignment_in.is_fragile,
-                                         wooden_packaging_required=consignment_in.wooden_packaging_required,
-                                         insurance_required=consignment_in.insurance_required,
-                                         item_count_check_required=consignment_in.item_count_check_required,
-                                         contains_liquid_fee=consignment_in.contains_liquid_fee,
-                                         is_fragile_fee=consignment_in.is_fragile_fee,
-                                         wooden_packaging_required_fee=consignment_in.wooden_packaging_required_fee,
-                                         insurance_required_fee=consignment_in.insurance_required_fee,
-                                         item_count_check_required_fee=consignment_in.item_count_check_required_fee,
-                                         code=code,
-                                         note=consignment_in.note,
-                                         shipping_fee=0.0
+                                         code=code
                                      )
             crud.shipment.create(db, obj_in=shipment_in)
 
