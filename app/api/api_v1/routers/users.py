@@ -93,8 +93,9 @@ def read_user_me(
     else:
         role = current_user.user_role
 
-    user_finance = crud.user_finance.get(db, db_obj=current_user)
-    user_addresses = crud.user_address.get_multi_by_user_id(db, user_id=current_user.id)
+    user_finance = crud.user_finance.get_by_user_id(db, user_id=current_user.id)
+
+    user_addresses = crud.user_address.get_multi(db, filters={"user_id": current_user.id})
 
     user_data = schemas.User(
         id=current_user.id,
