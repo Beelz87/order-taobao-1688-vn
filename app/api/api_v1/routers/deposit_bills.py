@@ -8,7 +8,7 @@ from app import schemas, models, crud
 from app.api import deps
 from app.constants.deposit import DepositStatus
 from app.constants.role import Role
-from app.schemas import UserFinanceUpdate
+from app.schemas import UserFinanceUpdate, UserFinanceCreate
 from app.schemas.base.response import Response
 
 router = APIRouter(prefix="/deposit-bills", tags=["deposit-bills"])
@@ -78,15 +78,16 @@ def update_deposit_bill(
     if deposit_bill.status == DepositStatus.APPROVED.value:
         user_finance = crud.user_finance.get_by_user_id(db, user_id=deposit_bill.user_id)
         if not user_finance:
-            raise HTTPException(
-                status_code=404,
-                detail="The user finance does not exist in the system.",
-            )
-        new_amount = user_finance.balance + deposit_bill.balance if user_finance else deposit_bill.balance
-        crud.user_finance.update(db, db_obj=user_finance,
-                                 obj_in=UserFinanceUpdate(
-                                    balance=new_amount
-                                 ),
-                                current_user_id=current_user.id)
+            crud.user_finance.create(db, obj_in=UserFinanceCreate(
+                user_id=deposit_bill.user_id,
+                balance=deposit_bill.amount
+            ))
+        else:
+            new_amount = user_finance.balance + deposit_bill.balance if user_finance.balance else deposit_bill.balance
+            crud.user_finance.update(db, db_obj=user_finance,
+                                     obj_in=UserFinanceUpdate(
+                                        balance=new_amount
+                                     ),
+                                    current_user_id=current_user.id)
 
     return Response(message="", data=deposit_bill)
