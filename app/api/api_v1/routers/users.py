@@ -106,7 +106,7 @@ def read_user_me(
         updated_at=current_user.updated_at,
         user_role=role,
         user_finance=user_finance,
-        addresses=user_addresses
+        user_addresses=user_addresses
     )
 
     return Response(message="", data=user_data)
