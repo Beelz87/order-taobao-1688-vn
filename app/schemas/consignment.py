@@ -62,18 +62,6 @@ class ConsignmentInDBBase(BaseModel):
     created_at: datetime
     updated_at: datetime
 
-    contains_liquid: bool = False
-    is_fragile: bool = False
-    wooden_packaging_required: bool = False
-    insurance_required: bool = False
-    item_count_check_required: bool = False
-
-    contains_liquid_fee: float = 0.0
-    is_fragile_fee: float = 0.0
-    wooden_packaging_required_fee: float = 0.0
-    insurance_required_fee: float = 0.0
-    item_count_check_required_fee: float = 0.0
-
     number_of_packages: int
     domestic_shipping_fee: float = 0.0
     product_category_id: Optional[int] = None
