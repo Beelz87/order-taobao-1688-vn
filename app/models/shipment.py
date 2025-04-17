@@ -30,9 +30,19 @@ class Shipment(Base):
     finance_status = Column(Integer(), nullable=False, default=0)
 
     note = Column(Text(), nullable=True)
-    code = Column(String(128), nullable=False, default="")
+    code = Column(String(128), index=True, nullable=False, default="")
 
     domestic_shipping_fee = Column(Float(), nullable=False, default=0.0)
+
+    weight = Column(Float(), default=0.0, nullable=False)
+    height = Column(Float(), default=0.0, nullable=False)
+    wide = Column(Float(), default=0.0, nullable=False)
+    length = Column(Float(), default=0.0, nullable=False)
+
+    weight_packaged = Column(Float(), default=0.0, nullable=False)
+    height_packaged = Column(Float(), default=0.0, nullable=False)
+    wide_packaged = Column(Float(), default=0.0, nullable=False)
+    length_packaged = Column(Float(), default=0.0, nullable=False)
 
     created_at = Column(DateTime, index=True, default=datetime.now(UTC))
     updated_at = Column(

@@ -25,6 +25,16 @@ class ShipmentBase(BaseModel):
 
     domestic_shipping_fee: float = 0.0
 
+    weight: float = 0.0
+    height: float = 0.0
+    wide: float = 0.0
+    length: float = 0.0
+
+    weight_packaged: float = 0.0
+    height_packaged: float = 0.0
+    wide_packaged: float = 0.0
+    length_packaged: float = 0.0
+
     code: str
     note: Optional[str] = None
 
@@ -51,6 +61,16 @@ class ShipmentUpdate(BaseModel):
     insurance_required_fee: float = 0.0
     item_count_check_required_fee: float = 0.0
 
+    weight: float = 0.0
+    height: float = 0.0
+    wide: float = 0.0
+    length: float = 0.0
+
+    weight_packaged: float = 0.0
+    height_packaged: float = 0.0
+    wide_packaged: float = 0.0
+    length_packaged: float = 0.0
+
     domestic_shipping_fee: float = 0.0
 
 
@@ -59,6 +79,15 @@ class ShipmentInDBBase(ShipmentBase):
     consignment: Optional[Consignment]
     created_at: datetime
     updated_at: datetime
+
+    weight: float
+    height: float
+    wide: float
+    length: float
+    weight_packaged: float
+    height_packaged: float
+    wide_packaged: float
+    length_packaged: float
 
     class Config:
         from_attributes = True

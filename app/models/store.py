@@ -1,5 +1,5 @@
 from datetime import datetime, UTC
-from sqlalchemy import Column, String, Boolean, DateTime, Integer
+from sqlalchemy import Column, String, Boolean, DateTime, Integer, Float
 from sqlalchemy.orm import relationship
 
 from app.constants.store import StoreType
@@ -18,6 +18,7 @@ class Store(Base):
     is_active = Column(Boolean(), default=True)
     type_store = Column(Integer, default=StoreType.SOURCE.value)
     code = Column(String(255), unique=True, nullable=True)
+    base_fee = Column(Float, default=0.0, nullable=True)
 
     created_at = Column(DateTime, default=datetime.now(UTC))
     updated_at = Column(

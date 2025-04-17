@@ -11,7 +11,7 @@ from app import schemas, models, crud
 from app.api import deps
 from app.constants.role import Role
 from app.constants.shipment import ShipmentStatus, ShipmentFinanceStatus
-from app.schemas import ShipmentCreate
+from app.schemas import ShipmentCreate, ShipmentUpdate
 from app.schemas.base.response import Response
 
 router = APIRouter(prefix="/consignments", tags=["consignments"])
@@ -113,12 +113,29 @@ def create_consignment(
     consignment = crud.consignment.create(db, obj_in=consignment_in)
 
     if consignment_in.foreign_shipment_codes:
+        clone_weight_flag = True
         for code in consignment_in.foreign_shipment_codes:
-            shipment_in = ShipmentCreate(consignment_id=consignment.id,
-                                         shipment_status=ShipmentStatus.FOREIGN_SHIPPING.value,
-                                         finance_status=ShipmentFinanceStatus.NOT_APPROVED.value,
-                                         code=code
-                                     )
+            if clone_weight_flag:
+                shipment_in = ShipmentCreate(consignment_id=consignment.id,
+                                             shipment_status=ShipmentStatus.FOREIGN_SHIPPING.value,
+                                             finance_status=ShipmentFinanceStatus.NOT_APPROVED.value,
+                                             code=code,
+                                             weight=consignment_in.weight,
+                                             height=consignment_in.height,
+                                             wide=consignment_in.wide,
+                                             length=consignment_in.length,
+                                             weight_packaged=consignment_in.weight_packaged,
+                                             height_packaged=consignment_in.height_packaged,
+                                             wide_packaged=consignment_in.wide_packaged,
+                                             length_packaged=consignment_in.length_packaged
+                                             )
+                clone_weight_flag = False
+            else:
+                shipment_in = ShipmentCreate(consignment_id=consignment.id,
+                                             shipment_status=ShipmentStatus.FOREIGN_SHIPPING.value,
+                                             finance_status=ShipmentFinanceStatus.NOT_APPROVED.value,
+                                             code=code
+                                            )
             crud.shipment.create(db, obj_in=shipment_in)
 
     consignment.image_path = consignment_in.image_path
@@ -162,23 +179,36 @@ def update_consignment(
     consignment = crud.consignment.update(db, db_obj=consignment, obj_in=consignment_in)
 
     if consignment_in.foreign_shipment_codes:
+        db_shipments = crud.shipment.get_multi(db, limit=1000, filters={"consignment_id": consignment.id})
         for code in consignment_in.foreign_shipment_codes:
-            shipment_in = ShipmentCreate(consignment_id=consignment.id,
-                                         shipment_status=ShipmentStatus.FOREIGN_SHIPPING.value,
-                                         finance_status=ShipmentFinanceStatus.NOT_APPROVED.value,
-                                         contains_liquid=consignment_in.contains_liquid,
-                                         is_fragile=consignment_in.is_fragile,
-                                         wooden_packaging_required=consignment_in.wooden_packaging_required,
-                                         insurance_required=consignment_in.insurance_required,
-                                         item_count_check_required=consignment_in.item_count_check_required,
-                                         contains_liquid_fee=consignment_in.contains_liquid_fee,
-                                         is_fragile_fee=consignment_in.is_fragile_fee,
-                                         wooden_packaging_required_fee=consignment_in.wooden_packaging_required_fee,
-                                         insurance_required_fee=consignment_in.insurance_required_fee,
-                                         item_count_check_required_fee=consignment_in.item_count_check_required_fee,
-                                         code=code,
-                                         note=consignment_in.note
-                                     )
-            crud.shipment.create(db, obj_in=shipment_in)
+            db_shipment = next((s for s in db_shipments if s.code == code), None)
+            if not db_shipment:
+                shipment_in = ShipmentCreate(consignment_id=consignment.id,
+                                             shipment_status=ShipmentStatus.FOREIGN_SHIPPING.value,
+                                             finance_status=ShipmentFinanceStatus.NOT_APPROVED.value,
+                                             code=code,
+                                             weight=consignment_in.weight,
+                                             height=consignment_in.height,
+                                             wide=consignment_in.wide,
+                                             length=consignment_in.length,
+                                             weight_packaged=consignment_in.weight_packaged,
+                                             height_packaged=consignment_in.height_packaged,
+                                             wide_packaged=consignment_in.wide_packaged,
+                                             length_packaged=consignment_in.length_packaged)
+
+                crud.shipment.create(db, obj_in=shipment_in)
+            else:
+                shipment_in = ShipmentUpdate(shipment_status=db_shipment.shipment_status,
+                                             finance_status=db_shipment.finance_status,
+                                             weight=consignment_in.weight,
+                                             height=consignment_in.height,
+                                             wide=consignment_in.wide,
+                                             length=consignment_in.length,
+                                             weight_packaged=consignment_in.weight_packaged,
+                                             height_packaged=consignment_in.height_packaged,
+                                             wide_packaged=consignment_in.wide_packaged,
+                                             length_packaged=consignment_in.length_packaged)
+
+                crud.shipment.update(db, db_obj=db_shipment, obj_in=shipment_in)
 
     return Response(message="", data=consignment)

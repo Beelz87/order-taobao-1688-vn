@@ -25,7 +25,7 @@ class User(Base):
     )
 
     account_id = Column(
-        Integer(), ForeignKey("accounts.id"), nullable=False
+        Integer(), ForeignKey("accounts.id"), nullable=True
     )
 
     user_role = relationship("UserRole", back_populates="user", uselist=False)

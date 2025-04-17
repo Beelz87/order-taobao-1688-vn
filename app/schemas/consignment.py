@@ -51,6 +51,7 @@ class ConsignmentInDBBase(BaseModel):
     shipping_phone_number: str
     shipping_status: int
     store_status: int
+
     weight: float
     height: float
     wide: float
@@ -59,6 +60,7 @@ class ConsignmentInDBBase(BaseModel):
     height_packaged: float
     wide_packaged: float
     length_packaged: float
+
     created_at: datetime
     updated_at: datetime
 

@@ -87,13 +87,29 @@ def update_shipment(
 
     if (db_shipment.shipment_status == ShipmentStatus.VN_RECEIVED.value and
             shipment_in.shipment_status == ShipmentStatus.VN_SHIPMENT_REQUESTED.value):
+        store = crud.store.get(db, id=db_consignment.dest_store_id)
+        if not store:
+            raise HTTPException(
+                status_code=404,
+                detail="The store does not exist in the system."
+            )
+        elif store.base_fee is None or store.base_fee < 0:
+            raise HTTPException(
+                status_code=422,
+                detail="The store's base fee is not valid."
+            )
+
         user_finance = crud.user_finance.get_by_user_id(db, user_id=db_consignment.user_id)
+
+        shipping_fee = (store.base_fee * db_shipment.weight + db_shipment.wooden_packaging_required_fee +
+                        db_shipment.insurance_required_fee)
+
         if not user_finance:
             raise HTTPException(
                 status_code=404,
                 detail="User finance does not exist in the system."
             )
-        elif user_finance.balance < shipment_in.domestic_shipping_fee:
+        elif user_finance.balance < shipping_fee:
             raise HTTPException(
                 status_code=400,
                 detail="Not enough balance to create fulfillment."
@@ -107,7 +123,7 @@ def update_shipment(
         )
         crud.fulfillment.create(db, obj_in=fulfillment_in)
 
-        new_balance = user_finance.balance - shipment_in.domestic_shipping_fee
+        new_balance = user_finance.balance - shipping_fee
         user_finance_in = schemas.UserFinanceUpdate(
             balance=new_balance
         )

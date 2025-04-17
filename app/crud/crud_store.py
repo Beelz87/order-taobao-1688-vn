@@ -14,7 +14,8 @@ class CRUDStore(CRUDBase[Store, StoreCreate, StoreUpdate]):
             description=obj_in.description,
             is_active=obj_in.is_active,
             type_store=obj_in.type_store,
-            code=obj_in.code
+            code=obj_in.code,
+            base_fee=obj_in.base_fee
         )
         db.add(db_obj)
         db.commit()

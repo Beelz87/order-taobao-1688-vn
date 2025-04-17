@@ -9,6 +9,7 @@ class StoreBase(BaseModel):
     is_active: bool
     type_store: int
     code: str
+    base_fee: float
 
 
 # Properties to receive via API on creation
@@ -28,6 +29,7 @@ class StoreInDBBase(StoreBase):
     is_active: bool
     type_store: int
     code: str
+    base_fee: float
 
     class Config:
         from_attributes = True
