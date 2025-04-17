@@ -31,9 +31,7 @@ class CRUDConsignment(CRUDBase[Consignment, ConsignmentCreate, ConsignmentUpdate
 
         db_obj = Consignment(
             user_id=obj_in.user_id,
-            shipping_name=user_address.name,
-            shipping_phone_number=user_address.phone_number,
-            shipping_address=user_address.address,
+            user_address_id=obj_in.user_address_id,
             source_store_id=obj_in.source_store_id,
             dest_store_id=obj_in.dest_store_id,
             shipping_status=obj_in.shipping_status,
