@@ -33,4 +33,4 @@ class User(Base):
     consignments = relationship("Consignment", back_populates="user")
     deposit_bills = relationship("DepositBill", back_populates="user")
     user_addresses = relationship("UserAddress", back_populates="user")
-    user_finance = relationship("UserFinance", back_populates="user")
+    user_finance = relationship("UserFinance", back_populates="user", uselist=False)

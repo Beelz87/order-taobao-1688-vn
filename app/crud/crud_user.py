@@ -64,7 +64,10 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         return user.is_active
 
     def get(self, db: Session, *, id: int) -> Optional[User]:
-        return db.query(self.model).options(joinedload(User.user_addresses)).filter(User.id == id).first()
+        return db.query(self.model).options(
+            joinedload(User.user_addresses),
+            joinedload(User.user_finance)
+        ).filter(User.id == id).first()
 
     def get_by_account_id(
         self,
