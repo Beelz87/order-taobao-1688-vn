@@ -116,7 +116,7 @@ def update_shipment(
             )
 
         fulfillment_in = schemas.FulfillmentCreate(
-            consignment_id=shipment_in.consignment_id,
+            consignment_id=db_shipment.consignment_id,
             shipment_id=shipment_id,
             status=FulfillmentStatus.WAITING.value,
             shipping_type=FulfillmentShippingType.BUS_SHIPMENT.value
