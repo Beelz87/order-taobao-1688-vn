@@ -115,7 +115,17 @@ def update_shipment(
                 detail="Not enough balance to create fulfillment."
             )
 
+        user_address = crud.user_address.get(db, id=db_consignment.user_address_id)
+        if not user_address:
+            raise HTTPException(
+                status_code=404,
+                detail="User address does not exist in the system."
+            )
+
         fulfillment_in = schemas.FulfillmentCreate(
+            customer_name=user_address.name,
+            customer_phone=user_address.phone_number,
+            customer_address=user_address.address,
             consignment_id=db_shipment.consignment_id,
             shipment_id=shipment_id,
             status=FulfillmentStatus.WAITING.value,

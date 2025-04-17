@@ -11,6 +11,9 @@ class FulfillmentBase(BaseModel):
     shipment_id: int
     status: int
     shipping_type: int
+    customer_name: Optional[str] = None
+    customer_phone: Optional[str] = None
+    customer_address: Optional[str] = None
 
 
 # Properties to receive via API on creation

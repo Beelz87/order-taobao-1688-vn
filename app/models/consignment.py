@@ -14,9 +14,7 @@ class Consignment(Base):
     user_id = Column(Integer(), ForeignKey("users.id"), nullable=False)
     user = relationship("User", back_populates="consignments")
 
-    shipping_name = Column(String(255), nullable=False)
-    shipping_phone_number = Column(String(13), nullable=False)
-    shipping_address = Column(String(2056), nullable=False)
+    user_address_id = Column(Integer(), ForeignKey("user_addresses.id"), nullable=False)
 
     source_store_id = Column(
         Integer, ForeignKey("stores.id"), nullable=False, index=True

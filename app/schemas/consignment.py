@@ -46,9 +46,7 @@ class ConsignmentInDBBase(BaseModel):
     user_id: int
     source_store_id: int
     dest_store_id: int
-    shipping_name: str
-    shipping_address: str
-    shipping_phone_number: str
+    user_address_id: int
     shipping_status: int
     store_status: int
 
