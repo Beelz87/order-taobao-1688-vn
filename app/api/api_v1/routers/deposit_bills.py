@@ -90,7 +90,7 @@ def update_deposit_bill(
                 balance=deposit_bill.amount
             ))
         else:
-            new_amount = user_finance.balance + deposit_bill.balance if user_finance.balance else deposit_bill.balance
+            new_amount = user_finance.balance + deposit_bill.amount if user_finance.balance else deposit_bill.amount
             crud.user_finance.update(db, db_obj=user_finance,
                                      obj_in=UserFinanceUpdate(
                                         balance=new_amount
