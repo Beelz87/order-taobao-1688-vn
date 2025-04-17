@@ -78,9 +78,16 @@ def update_shipment(
             detail="The shipment does not exist in the system."
         )
 
+    db_consignment = crud.consignment.get(db, id=db_shipment.consignment_id)
+    if not db_consignment:
+        raise HTTPException(
+            status_code=404,
+            detail="The consignment of this shipment does not exist in the system."
+        )
+
     if (db_shipment.shipment_status == ShipmentStatus.VN_RECEIVED.value and
             shipment_in.shipment_status == ShipmentStatus.VN_SHIPMENT_REQUESTED.value):
-        user_finance = crud.user_finance.get_by_user_id(db, user_id=db_shipment.user_id)
+        user_finance = crud.user_finance.get_by_user_id(db, user_id=db_consignment.user_id)
         if not user_finance:
             raise HTTPException(
                 status_code=404,
