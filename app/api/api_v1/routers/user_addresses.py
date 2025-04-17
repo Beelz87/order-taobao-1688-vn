@@ -45,7 +45,7 @@ def read_user_addresses(
 
     return Response(message="", data=user_addresses)
 
-@router.post("", response_model=Response[List[schemas.UserAddress]])
+@router.post("", response_model=Response[schemas.UserAddress])
 def create_user_addresses(
     *,
     db: Session = Depends(deps.get_db),
