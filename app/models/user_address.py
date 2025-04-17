@@ -17,4 +17,4 @@ class UserAddress(Base):
     address = Column(String(2056), nullable=False)
     is_active = Column(Boolean, default=True)
 
-    user = relationship("User", back_populates="addresses")
+    user = relationship("User", back_populates="user_addresses")
