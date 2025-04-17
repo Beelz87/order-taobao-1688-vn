@@ -23,7 +23,7 @@ class ShipmentBase(BaseModel):
     insurance_required_fee: float = 0.0
     item_count_check_required_fee: float = 0.0
 
-    shipping_fee: float = 0.0
+    domestic_shipping_fee: float = 0.0
 
     code: str
     note: Optional[str] = None
@@ -51,7 +51,7 @@ class ShipmentUpdate(BaseModel):
     insurance_required_fee: float = 0.0
     item_count_check_required_fee: float = 0.0
 
-    shipping_fee: float = 0.0
+    domestic_shipping_fee: float = 0.0
 
 
 class ShipmentInDBBase(ShipmentBase):

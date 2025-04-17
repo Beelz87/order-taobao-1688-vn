@@ -27,7 +27,7 @@ class CRUDShipment(CRUDBase[Shipment, ShipmentCreate, ShipmentUpdate]):
             item_count_check_required_fee=obj_in.item_count_check_required_fee,
             note=obj_in.note,
             code=obj_in.code,
-            shipping_fee=obj_in.shipping_fee
+            domestic_shipping_fee=obj_in.domestic_shipping_fee
         )
         db.add(db_obj)
         db.commit()
