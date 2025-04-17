@@ -93,6 +93,9 @@ def read_user_me(
     else:
         role = current_user.user_role
 
+    user_finance = crud.user_finance.get(db, db_obj=current_user)
+    user_addresses = crud.user_address.get_multi_by_user_id(db, user_id=current_user.id)
+
     user_data = schemas.User(
         id=current_user.id,
         email=current_user.email,
@@ -100,7 +103,9 @@ def read_user_me(
         full_name=current_user.full_name,
         created_at=current_user.created_at,
         updated_at=current_user.updated_at,
-        user_role=role
+        user_role=role,
+        user_finance=user_finance,
+        addresses=user_addresses
     )
 
     return Response(message="", data=user_data)

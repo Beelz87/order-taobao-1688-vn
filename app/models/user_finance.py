@@ -11,7 +11,7 @@ class UserFinance(Base):
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
-    user = relationship("User", back_populates="user_finance")
+    user = relationship("User", back_populates="user_finance", uselist=False)
 
     balance = Column(Float, nullable=False)
     created_at = Column(DateTime, index=True, default=datetime.now(UTC))

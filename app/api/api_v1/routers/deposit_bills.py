@@ -82,7 +82,7 @@ def update_deposit_bill(
                 status_code=404,
                 detail="The user finance does not exist in the system.",
             )
-        new_amount = user_finance.balance + deposit_bill.balance
+        new_amount = user_finance.balance + deposit_bill.balance if user_finance else deposit_bill.balance
         crud.user_finance.update(db, db_obj=user_finance,
                                  obj_in=UserFinanceUpdate(
                                     balance=new_amount
