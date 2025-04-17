@@ -72,6 +72,13 @@ def update_deposit_bill(
             status_code=404,
             detail="The deposit bill does not exist in the system.",
         )
+
+    if deposit_bill.status != DepositStatus.PENDING.value:
+        raise HTTPException(
+            status_code=400,
+            detail="The deposit bill has already been processed.",
+        )
+
     deposit_bill = crud.deposit_bill.update(db, db_obj=deposit_bill, obj_in=deposit_bill_in,
                                             current_user_id=current_user.id)
 
