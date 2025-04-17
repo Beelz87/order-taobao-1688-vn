@@ -1,6 +1,6 @@
 from typing import Any, Dict, List, Optional, Union
 
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from app.core.security import get_password_hash, verify_password
 from app.crud.base import CRUDBase
@@ -62,6 +62,9 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
 
     def is_active(self, user: User) -> bool:
         return user.is_active
+
+    def get(self, db: Session, *, id: int) -> Optional[User]:
+        return db.query(self.model).options(joinedload(User.user_addresses)).filter(User.id == id).first()
 
     def get_by_account_id(
         self,
