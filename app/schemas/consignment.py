@@ -27,6 +27,8 @@ class ConsignmentBase(BaseModel):
     product_category_id: Optional[int] = None
     product_name: Optional[str] = None
 
+    note: Optional[str] = None
+
     foreign_shipment_codes: List[str] = None
     image_base64: Optional[str] = None
 
@@ -68,6 +70,8 @@ class ConsignmentInDBBase(BaseModel):
     product_name: Optional[str] = None
     code: str
     image_path: Optional[str] = None
+
+    note: Optional[str] = None
 
     foreign_shipment_codes: Optional[List[ConsignmentForeignShipmentCode]] = None
 

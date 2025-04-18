@@ -1,6 +1,6 @@
 from datetime import datetime, UTC
 
-from sqlalchemy import Column, UUID, ForeignKey, String, Integer, DateTime, Float, Boolean
+from sqlalchemy import Column, UUID, ForeignKey, String, Integer, DateTime, Float, Boolean, Text
 from sqlalchemy.orm import relationship
 
 from app.db.base_class import Base
@@ -12,7 +12,6 @@ class Consignment(Base):
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
 
     user_id = Column(Integer(), ForeignKey("users.id"), nullable=False)
-    user = relationship("User", back_populates="consignments")
 
     user_address_id = Column(Integer(), ForeignKey("user_addresses.id"), nullable=False)
 
@@ -21,16 +20,6 @@ class Consignment(Base):
     )
     dest_store_id = Column(
         Integer, ForeignKey("stores.id"), nullable=False, index=True
-    )
-    source_store = relationship(
-        "Store",
-        foreign_keys="Consignment.source_store_id",
-        back_populates="source_consignments"
-    )
-    dest_store = relationship(
-        "Store",
-        foreign_keys="Consignment.dest_store_id",
-        back_populates="dest_consignments"
     )
 
     shipping_status = Column(Integer(), nullable=False)
@@ -58,13 +47,26 @@ class Consignment(Base):
     product_category_id = Column(
         Integer(), ForeignKey("product_categories.id"), nullable=True
     )
-    product_category = relationship("ProductCategory", back_populates="consignments")
 
     number_of_packages = Column(Integer(), nullable=False, default=1)
     domestic_shipping_fee = Column(Float(), nullable=False, default=0.0)
     code = Column(String(255), nullable=False, index=True)
 
+    note = Column(Text(), nullable=True)
+
     shipments = relationship("Shipment", back_populates="consignment")
     foreign_shipment_codes = relationship("ConsignmentForeignShipmentCode", back_populates="consignment")
     fulfillments = relationship("Fulfillment", back_populates="consignment")
+    product_category = relationship("ProductCategory", back_populates="consignments")
+    source_store = relationship(
+        "Store",
+        foreign_keys="Consignment.source_store_id",
+        back_populates="source_consignments"
+    )
+    dest_store = relationship(
+        "Store",
+        foreign_keys="Consignment.dest_store_id",
+        back_populates="dest_consignments"
+    )
+    user = relationship("User", back_populates="consignments")
 

@@ -49,7 +49,8 @@ class CRUDConsignment(CRUDBase[Consignment, ConsignmentCreate, ConsignmentUpdate
             product_name=obj_in.product_name,
             number_of_packages=obj_in.number_of_packages,
             domestic_shipping_fee=obj_in.domestic_shipping_fee,
-            code=code
+            code=code,
+            note=obj_in.note
         )
         db.add(db_obj)
         db.commit()

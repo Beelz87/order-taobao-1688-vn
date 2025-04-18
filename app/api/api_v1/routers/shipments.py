@@ -102,7 +102,7 @@ def update_shipment(
         user_finance = crud.user_finance.get_by_user_id(db, user_id=db_consignment.user_id)
 
         shipping_fee = (store.base_fee * db_shipment.weight + db_shipment.wooden_packaging_required_fee +
-                        db_shipment.insurance_required_fee)
+                        db_shipment.insurance_required_fee + db_shipment.domestic_shipping_fee)
 
         if not user_finance:
             raise HTTPException(
