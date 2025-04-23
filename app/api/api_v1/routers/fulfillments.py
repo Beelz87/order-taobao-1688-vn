@@ -38,9 +38,9 @@ def read_fulfillments(
         filters["finance_status"] = finance_status
     if foreign_shipping_codes is not None:
         shipment_filters = {
-            "foreign_shipping_codes": foreign_shipping_codes
+            "codes": foreign_shipping_codes
         }
-        shipments = crud.shipment.get_multi(db, filters=foreign_shipping_codes)
+        shipments = crud.shipment.get_multi(db, filters=shipment_filters)
         if not shipments:
             raise HTTPException(
                 status_code=404,
