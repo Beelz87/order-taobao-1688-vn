@@ -127,7 +127,8 @@ def create_consignment(
                                              weight_packaged=consignment_in.weight_packaged,
                                              height_packaged=consignment_in.height_packaged,
                                              wide_packaged=consignment_in.wide_packaged,
-                                             length_packaged=consignment_in.length_packaged
+                                             length_packaged=consignment_in.length_packaged,
+                                             domestic_shipping_fee=consignment_in.domestic_shipping_fee
                                              )
                 clone_weight_flag = False
             else:
@@ -194,7 +195,8 @@ def update_consignment(
                                              weight_packaged=consignment_in.weight_packaged,
                                              height_packaged=consignment_in.height_packaged,
                                              wide_packaged=consignment_in.wide_packaged,
-                                             length_packaged=consignment_in.length_packaged)
+                                             length_packaged=consignment_in.length_packaged,
+                                             domestic_shipping_fee=consignment_in.domestic_shipping_fee)
 
                 crud.shipment.create(db, obj_in=shipment_in)
             else:
