@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import Any, List, Optional
 
 from fastapi import APIRouter, Depends, Security, HTTPException, Query
 from sqlalchemy.orm import Session
@@ -18,7 +18,7 @@ def read_fulfillments(
     consignment_id: int = None,
     fulfillment_status: int = None,
     finance_status: int = None,
-    foreign_shipping_codes: List[str] = Query(default=None),
+    foreign_shipping_codes: Optional[str] = Query(None, description="Comma-separated list of codes"),
     order_by: str = "id",
     direction: str = "desc",
     current_user: models.User = Security(
@@ -37,16 +37,18 @@ def read_fulfillments(
     if finance_status is not None:
         filters["finance_status"] = finance_status
     if foreign_shipping_codes is not None:
-        shipment_filters = {
-            "codes": foreign_shipping_codes
-        }
-        shipments = crud.shipment.get_multi(db, filters=shipment_filters)
-        if not shipments:
-            raise HTTPException(
-                status_code=404,
-                detail="The shipments do not exist in the system."
-            )
-        filters["shipment_id"] = [shipment.id for shipment in shipments]
+        codes_list = [code.strip() for code in foreign_shipping_codes.split(",")] if foreign_shipping_codes else None
+        if codes_list:
+            shipment_filters = {
+                "codes": foreign_shipping_codes
+            }
+            shipments = crud.shipment.get_multi(db, filters=shipment_filters)
+            if not shipments:
+                raise HTTPException(
+                    status_code=404,
+                    detail="The shipments do not exist in the system."
+                )
+            filters["shipment_id"] = [shipment.id for shipment in shipments]
 
     fulfillments = crud.fulfillment.get_multi(db, skip=skip, limit=limit, filters=filters,
                                               order_by=order_by, direction=direction)
