@@ -1,6 +1,6 @@
 from typing import Any, List
 
-from fastapi import APIRouter, Depends, Security, HTTPException
+from fastapi import APIRouter, Depends, Security, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app import schemas, models, crud
@@ -18,7 +18,7 @@ def read_fulfillments(
     consignment_id: int = None,
     fulfillment_status: int = None,
     finance_status: int = None,
-    foreign_shipping_codes: List[str] = None,
+    foreign_shipping_codes: List[str] = Query(default=None),
     order_by: str = "id",
     direction: str = "desc",
     current_user: models.User = Security(
