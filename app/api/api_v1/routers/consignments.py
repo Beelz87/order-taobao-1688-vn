@@ -49,18 +49,11 @@ def read_consignments(
     if created_at_end is not None:
         filters["created_at_end"] = created_at_end
 
-    consignments = []
-    if (current_user.user_role.role.name == Role.ADMIN["name"] or
-            current_user.user_role.role.name == Role.SUPER_ADMIN["name"]):
-       consignments = crud.consignment.get_multi(db, skip=skip, limit=limit, filters=filters,
-                                                 order_by=order_by, direction=direction)
-    elif current_user.user_role.role.name == Role.USER["name"]:
+    if current_user.user_role.role.name == Role.USER["name"]:
        filters["user_id"] = current_user.id
-       consignments = crud.consignment.get_multi(db, skip=skip, limit=limit, filters=filters,
-                                                 order_by=order_by, direction=direction)
 
-    # consignments = crud.consignment.get_multi(db, skip=skip, limit=limit, filters=filters,
-    #                                           order_by=order_by, direction=direction)
+    consignments = crud.consignment.get_multi(db, skip=skip, limit=limit, filters=filters,
+                                                 order_by=order_by, direction=direction)
 
     return Response(message="", data=consignments)
 

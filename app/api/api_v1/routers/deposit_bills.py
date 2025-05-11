@@ -21,7 +21,7 @@ def read_deposit_bills(
     created_at: datetime = None,
     current_user: models.User = Security(
         deps.get_current_active_user,
-        scopes=[Role.ADMIN["name"], Role.SUPER_ADMIN["name"]],
+        scopes=[Role.ADMIN["name"], Role.SUPER_ADMIN["name"], Role.USER["name"]],
     ),
 ) -> Any:
     """
@@ -30,6 +30,9 @@ def read_deposit_bills(
     filters = {}
     if created_at is not None:
         filters["created_at"] = created_at
+
+    if current_user.user_role.role.name == Role.USER["name"]:
+        filters["user_id"] = current_user.id
 
     deposit_bills = crud.deposit_bill.get_multi(db, skip=skip, limit=limit, filters=filters)
 

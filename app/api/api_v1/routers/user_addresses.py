@@ -12,14 +12,14 @@ router = APIRouter(prefix="/user_addresses", tags=["user_addresses"])
 
 def get_user_id_from_role(
     current_user: models.User,
-    requested_user_id: Optional[int]
+    user_id: Optional[int]
 ) -> int:
     if current_user.user_role.role.name == Role.USER["name"]:
         return current_user.id
     elif current_user.user_role.role.name in [Role.ADMIN["name"], Role.SUPER_ADMIN["name"]]:
-        if not requested_user_id:
+        if not user_id:
             raise HTTPException(status_code=400, detail="user_id is required for admins")
-        return requested_user_id
+        return user_id
     else:
         raise HTTPException(status_code=403, detail="Unauthorized role")
 
@@ -41,6 +41,7 @@ def read_user_addresses(
     filters = {}
     if final_user_id is not None:
         filters["user_id"] = final_user_id
+
     user_addresses = crud.user_address.get_multi(db, skip=skip, limit=limit, filters=filters)
 
     return Response(message="", data=user_addresses)

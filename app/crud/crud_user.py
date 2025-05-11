@@ -1,5 +1,6 @@
 from typing import Any, Dict, List, Optional, Union
 
+from sqlalchemy import desc, asc
 from sqlalchemy.orm import Session, joinedload
 
 from app.core.security import get_password_hash, verify_password
@@ -19,6 +20,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             hashed_password=get_password_hash(obj_in.password),
             full_name=obj_in.full_name,
             account_id=obj_in.account_id,
+            phone_number=obj_in.phone_number
         )
         db.add(db_obj)
         db.commit()
@@ -84,6 +86,41 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             .limit(limit)
             .all()
         )
+
+    def get_multi(
+        self, db: Session, *, skip: int = 0, limit: int = 100, filters: Dict[str, Any] = None,
+                                              order_by = "id", direction = "desc"
+    ) -> List[User]:
+        query = db.query(self.model)
+        if filters:
+            created_at_start = filters.pop("created_at_start", None)
+            created_at_end = filters.pop("created_at_end", None)
+
+            for key, value in filters.items():
+                if hasattr(self.model, key):  # Ensure the key exists in the model
+                    query = query.filter(getattr(self.model, key) == value)
+                else:
+                    raise ValueError(f"Invalid filter key: {key}")
+
+            if created_at_start and created_at_end:
+                query = query.filter(
+                    self.model.created_at >= created_at_start,
+                    self.model.created_at <= created_at_end
+                )
+            elif created_at_start and not created_at_end:
+                query = query.filter(self.model.created_at >= created_at_start)
+            elif not created_at_start and created_at_end:
+                query = query.filter(self.model.created_at <= created_at_end)
+
+        try:
+            if direction.lower() == "desc":
+                query = query.order_by(desc(order_by))
+            else:
+                query = query.order_by(asc(order_by))
+        except Exception as e:
+            raise ValueError(f"Invalid order_by format: {order_by}") from e
+
+        return query.offset(skip).limit(limit).all()
 
 
 user = CRUDUser(User)

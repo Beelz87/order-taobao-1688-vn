@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Any, List
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Security
@@ -19,6 +20,13 @@ def read_users(
     db: Session = Depends(deps.get_db),
     skip: int = 0,
     limit: int = 100,
+    user_code: str = None,
+    phone_number: str = None,
+    email: str = None,
+    created_at_start: datetime = None,
+    created_at_end: datetime = None,
+    order_by: str = "id",
+    direction: str = "desc",
     current_user: models.User = Security(
         deps.get_current_active_user,
         scopes=[Role.ADMIN["name"], Role.SUPER_ADMIN["name"]],
@@ -27,7 +35,22 @@ def read_users(
     """
     Retrieve all users.
     """
-    users = crud.user.get_multi(db, skip=skip, limit=limit,)
+    filters = {}
+    if id is not None:
+        filters["id"] = id
+    if user_code is not None:
+        filters["user_code"] = user_code
+    if phone_number is not None:
+        filters["phone_number"] = phone_number
+    if email is not None:
+        filters["email"] = email
+    if created_at_start is not None:
+        filters["created_at_start"] = created_at_start
+    if created_at_end is not None:
+        filters["created_at_end"] = created_at_end
+
+    users = crud.user.get_multi(db, skip=skip, limit=limit, filters=filters,
+                                order_by=order_by, direction=direction)
 
     return Response(message="", data=users)
 
@@ -135,6 +158,14 @@ def create_user_open(
             status_code=409,
             detail="The user with this email already exists in the system",
         )
+
+    default_role = crud.role.get_by_name(db, name=Role.USER["name"])
+    if not default_role:
+        raise HTTPException(
+            status_code=404,
+            detail="Default role not found",
+        )
+
     user_in = schemas.UserCreate(
         password=password,
         email=email,
@@ -142,6 +173,12 @@ def create_user_open(
         phone_number=phone_number,
     )
     user = crud.user.create(db, obj_in=user_in)
+
+    user_role_in = schemas.UserRoleCreate(
+        user_id=user.id,
+        role_id=default_role.id
+    )
+    user_role = crud.user_role.create(db, obj_in=user_role_in)
 
     return Response(message="", data=user)
 
