@@ -20,6 +20,7 @@ def read_users(
     db: Session = Depends(deps.get_db),
     skip: int = 0,
     limit: int = 100,
+    id: int = None,
     user_code: str = None,
     phone_number: str = None,
     email: str = None,
