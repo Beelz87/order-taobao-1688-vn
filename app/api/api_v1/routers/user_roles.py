@@ -20,6 +20,10 @@ def assign_user_role(
 ) -> Any:
     """
     Assign a role to a user after creation of a user
+
+    ## Request Body Parameters
+    - **user_id** (`integer`, required): The ID of the user to retrieve.
+    - **role_id** (`integer`, required): The ID of the role to assign to the user.
     """
     user_role = crud.user_role.get_by_user_id(db, user_id=user_role_in.user_id)
     if user_role:
@@ -47,6 +51,9 @@ def update_user_role(
 ) -> Any:
     """
     Update a users role.
+
+    ## Request Body Parameters
+    - **user_id** (`integer`, required): The ID of the user to retrieve.
     """
     user_role = crud.user_role.get_by_user_id(db, user_id=user_id)
     if not user_role:

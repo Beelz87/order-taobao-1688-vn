@@ -1,11 +1,11 @@
+from app.schemas.user_address import UserAddress
+from app.schemas.user_finance import UserFinance
+from app.schemas.user_role import UserRole
+
 from datetime import datetime
 from typing import Optional, List
 
 from pydantic import BaseModel, EmailStr
-
-from app.schemas.user_address import UserAddress
-from app.schemas.user_finance import UserFinance
-from app.schemas.user_role import UserRole
 
 
 # Shared properties

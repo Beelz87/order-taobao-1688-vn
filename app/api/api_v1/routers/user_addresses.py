@@ -1,6 +1,6 @@
 from typing import Any, List, Optional
 
-from fastapi import APIRouter, Depends, Security, HTTPException, Query
+from fastapi import APIRouter, Depends, Security, HTTPException, Query, Path
 from sqlalchemy.orm import Session
 
 from app import schemas, models, crud
@@ -26,9 +26,9 @@ def get_user_id_from_role(
 @router.get("", response_model=Response[List[schemas.UserAddress]])
 def read_user_addresses(
     db: Session = Depends(deps.get_db),
-    skip: int = 0,
-    limit: int = 100,
-    user_id: Optional[int] = Query(None),
+    skip: int = Query(0, description="Number of records to skip (for pagination)"),
+    limit: int = Query(100, description="Maximum number of records to return"),
+    user_id: Optional[int] = Query(None, description="Filter addresses by user ID (optional)"),
     current_user: models.User = Security(
         deps.get_current_active_user,
         scopes=[Role.ADMIN["name"], Role.SUPER_ADMIN["name"], Role.USER["name"]],
@@ -51,7 +51,7 @@ def create_user_addresses(
     *,
     db: Session = Depends(deps.get_db),
     addresses_in: schemas.UserAddressCreate,
-    user_id: Optional[int] = Query(None),
+    user_id: Optional[int] = Query(None, description= "The ID of the user to retrieve"),
     current_user: models.User = Security(
         deps.get_current_active_user,
         scopes=[Role.USER["name"], Role.ADMIN["name"], Role.SUPER_ADMIN["name"]],
@@ -59,6 +59,12 @@ def create_user_addresses(
 ) -> Any:
     """
     Create new user address.
+
+    ## Request Body Parameters
+    - **name** (`string`, required): Name of the user or contact person for this address.
+    - **phone_number** (`string`, required): Contact phone number associated with this address.
+    - **address** (`string`, required): Full address details (e.g., street, city, postal code).
+    - **is_active** (`boolean`, optional): Indicates whether this address is currently active. Default is True.
     """
     final_user_id = get_user_id_from_role(current_user, user_id)
 
@@ -70,9 +76,9 @@ def create_user_addresses(
 def update_user_address(
     *,
     db: Session = Depends(deps.get_db),
-    user_address_id: int,
+    user_address_id: int = Path (..., description= "The ID of the user address to retrieve"),
     address_in: schemas.UserAddressUpdate,
-    user_id: Optional[int] = Query(None),
+    user_id: Optional[int] = Query(None, description= "The ID of the user to retrieve"),
     current_user: models.User = Security(
         deps.get_current_active_user,
         scopes=[Role.USER["name"], Role.ADMIN["name"], Role.SUPER_ADMIN["name"]],
@@ -80,6 +86,13 @@ def update_user_address(
 ) -> Any:
     """
     Update a user address.
+
+    ## Request Body Parameters
+    - **name** (`string`, required): Name of the user or contact person for this address.
+    - **phone_number** (`string`, required): Contact phone number associated with this address.
+    - **address** (`string`, required): Full address details (e.g., street, city, postal code).
+    - **is_active** (`boolean`, optional): Indicates whether this address is currently active. Default is True.
+
     """
     final_user_id = get_user_id_from_role(current_user, user_id)
     user_address = crud.user_address.get(db, user_address_id)

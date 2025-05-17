@@ -1,7 +1,7 @@
 from datetime import datetime
-from typing import Any, List
+from typing import Any, List, Optional
 
-from fastapi import APIRouter, Depends, Security, HTTPException
+from fastapi import APIRouter, Depends, Security, HTTPException, Query, Path
 from sqlalchemy.orm import Session
 
 from app import schemas, models, crud
@@ -16,9 +16,20 @@ router = APIRouter(prefix="/deposit-bills", tags=["deposit-bills"])
 @router.get("", response_model=Response[List[schemas.DepositBill]])
 def read_deposit_bills(
     db: Session = Depends(deps.get_db),
-    skip: int = 0,
-    limit: int = 100,
-    created_at: datetime = None,
+        skip: int = Query(
+            0,
+            description="Number of records to skip for pagination",
+            ge=0
+        ),
+        limit: int = Query(
+            100,
+            description="Maximum number of records to return",
+            ge=1, le=1000
+        ),
+    created_at: Optional[datetime] = Query(
+        None,
+        description="Filter users created on or after this date and time (format: YYYY-MM-DDTHH:MM:SS)"
+    ),
     current_user: models.User = Security(
         deps.get_current_active_user,
         scopes=[Role.ADMIN["name"], Role.SUPER_ADMIN["name"], Role.USER["name"]],
@@ -50,6 +61,16 @@ def create_deposit_bill(
 ) -> Any:
     """
     Create new deposit bill.
+
+    ## Request Body Parameters
+
+    - **user_id** (`integer`, required): ID of the user making the deposit.
+    - **user_fullname** (`string`, required): Full name of the user making the deposit.
+    - **amount** (`float`, required): Deposit amount.
+    - **deposit_type** (`integer`, optional): Type of deposit. Default is CASH.
+    - **note** (`string`, required): Description or note related to the deposit.
+    - **status** (`integer`, optional): Status of the deposit. Default is PENDING.
+
     """
     deposit_bill = crud.deposit_bill.create(db, obj_in=deposit_bill_in)
 
@@ -59,7 +80,7 @@ def create_deposit_bill(
 def update_deposit_bill(
     *,
     db: Session = Depends(deps.get_db),
-    deposit_bill_id: int,
+    deposit_bill_id: int = Path(... , description= "The ID of the deposit bill to retrieve"),
     deposit_bill_in: schemas.DepositBillUpdate,
     current_user: models.User = Security(
         deps.get_current_active_user,
@@ -68,6 +89,13 @@ def update_deposit_bill(
 ) -> Any:
     """
     Update deposit bill.
+
+
+    ## Request Body Parameters
+    - **deposit_type** (`integer`, optional): Type of deposit. Default is CASH.
+    - **note** (`string`, required): Description or note related to the deposit.
+    - **status** (`integer`, optional): Status of the deposit. Default is PENDING.
+
     """
     deposit_bill = crud.deposit_bill.get(db, id=deposit_bill_id)
     if not deposit_bill:

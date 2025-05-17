@@ -1,10 +1,8 @@
 from datetime import datetime
-from typing import Any, List
 
-from fastapi import APIRouter, Body, Depends, HTTPException, Security
+from fastapi import APIRouter, Body, Depends, HTTPException, Security, Query, Path
 from fastapi.encoders import jsonable_encoder
 from pydantic.networks import EmailStr
-from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
 from app.api import deps
@@ -12,22 +10,57 @@ from app.constants.role import Role
 from app.core.config import settings
 from app.schemas.base.response import Response
 
+from sqlalchemy.orm import Session
+from typing import Any, List, Optional
+
 router = APIRouter(prefix="/users", tags=["users"])
 
 
-@router.get("", response_model=Response[List[schemas.User]])
+@router.get("", response_model=Response[List[schemas.User]], summary="Read Users")
 def read_users(
     db: Session = Depends(deps.get_db),
-    skip: int = 0,
-    limit: int = 100,
-    id: int = None,
-    user_code: str = None,
-    phone_number: str = None,
-    email: str = None,
-    created_at_start: datetime = None,
-    created_at_end: datetime = None,
-    order_by: str = "id",
-    direction: str = "desc",
+    skip: int = Query(
+        0,
+        description="Number of records to skip for pagination",
+        ge=0
+    ),
+    limit: int = Query(
+        100,
+        description="Maximum number of records to return",
+        ge=1, le=1000
+    ),
+    id: Optional[int] = Query(
+        None,
+        description="Filter users by ID"
+    ),
+    user_code: Optional[str] = Query(
+        None,
+        description="Filter users by user code"
+    ),
+    phone_number: Optional[str] = Query(
+        None,
+        description="Filter users by phone number"
+    ),
+    email: Optional[str] = Query(
+        None,
+        description="Filter users by email address"
+    ),
+    created_at_start: Optional[datetime] = Query(
+        None,
+        description="Filter users created on or after this date and time (format: YYYY-MM-DDTHH:MM:SS)"
+    ),
+    created_at_end: Optional[datetime] = Query(
+        None,
+        description="Filter users created on or before this date and time (format: YYYY-MM-DDTHH:MM:SS)"
+    ),
+    order_by: str = Query(
+        "id",
+        description="Field to order results by (e.g., 'id', 'email', 'created_at')"
+    ),
+    direction: str = Query(
+        "desc",
+        description="Sort direction ('asc' for ascending, 'desc' for descending)"
+    ),
     current_user: models.User = Security(
         deps.get_current_active_user,
         scopes=[Role.ADMIN["name"], Role.SUPER_ADMIN["name"]],
@@ -68,6 +101,17 @@ def create_user(
 ) -> Any:
     """
     Create new user.
+
+    ## Request Body Parameters
+    - **email** (`string`, required): Email address of the user (must be unique).
+    - **is_active** (`boolean`, optional): Whether the user is active (true/false). Default is `true`.
+    - **full_name** (`string`, required): Full name of the user.
+    - **phone_number** (`string`, optional): Contact number.
+    - **account_id** (`integer`, optional): ID of the account the user is associated with.
+    - **password** (`string`, required): Raw password (will be hashed).
+    - **user_code** (`string`, optional): Optional custom code for the user.
+    - **is_user_code_edited** (`boolean`, optional): Set to true if the user_code was manually modified.
+
     """
     user = crud.user.get_by_email(db, email=user_in.email)
     if user:
@@ -90,6 +134,11 @@ def update_user_me(
 ) -> Any:
     """
     Update own user.
+
+    ## Request Body Parameters
+    - **email** (`string`, optional): New email address of the user (must be unique).
+    - **phone_number** (`string`, optional): New phone number of the user.
+    - **full_name** (`string`, optional): New full name of the user.
     """
     current_user_data = jsonable_encoder(current_user)
     user_in = schemas.UserUpdate(**current_user_data)
@@ -149,6 +198,13 @@ def create_user_open(
 ) -> Any:
     """
     Create new user without the need to be logged in.
+
+    ## Request Body Parameters
+    - **password** (`string`, required): Password for the new user.
+    - **email** (`string`, required): Email address of the new user (must be unique).
+    - **full_name** (`string`, required): Full name of the new user.
+    - **phone_number** (`string`, optional): Phone number of the new user.
+
     """
     if not settings.USERS_OPEN_REGISTRATION:
         raise HTTPException(
@@ -188,7 +244,7 @@ def create_user_open(
 
 @router.get("/{user_id}", response_model=Response[schemas.User])
 def read_user_by_id(
-    user_id: int,
+    user_id: int = Path(..., description="The ID of the user to retrieve"),
     current_user: models.User = Security(
         deps.get_current_active_user,
         scopes=[Role.ADMIN["name"], Role.SUPER_ADMIN["name"]],
@@ -207,7 +263,7 @@ def read_user_by_id(
 def update_user(
     *,
     db: Session = Depends(deps.get_db),
-    user_id: int,
+    user_id: int = Path(..., description="The ID of the user to retrieve" ),
     user_in: schemas.UserUpdate,
     current_user: models.User = Security(
         deps.get_current_active_user,

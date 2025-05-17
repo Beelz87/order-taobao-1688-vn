@@ -1,6 +1,6 @@
 from typing import Any, List, Optional
 
-from fastapi import APIRouter, Depends, Security, HTTPException, Query
+from fastapi import APIRouter, Depends, Security, HTTPException, Query, Path
 from sqlalchemy.orm import Session
 
 from app import schemas, models, crud
@@ -12,16 +12,18 @@ router = APIRouter(prefix="/fulfillments", tags=["fulfillments"])
 
 @router.get("", response_model=Response[List[schemas.Fulfillment]])
 def read_fulfillments(
-    db: Session = Depends(deps.get_db),
-    skip: int = 0,
-    limit: int = 100,
-    consignment_id: int = None,
-    fulfillment_status: int = None,
-    finance_status: int = None,
-    foreign_shipping_codes: Optional[str] = Query(None, description="Comma-separated list of codes"),
-    order_by: str = "id",
-    direction: str = "desc",
-    current_user: models.User = Security(
+        db: Session = Depends(deps.get_db),
+        skip: int = Query(0, description="Number of records to skip for pagination"),
+        limit: int = Query(100, description="Maximum number of records to return"),
+        consignment_id: Optional[int] = Query(None, description="Filter by consignment ID"),
+        fulfillment_status: Optional[int] = Query(None, description="Filter by fulfillment status"),
+        finance_status: Optional[int] = Query(None, description="Filter by finance status"),
+        foreign_shipping_codes: Optional[str] = Query(
+            None, description="Comma-separated list of foreign shipping codes to filter by"
+        ),
+        order_by: str = Query("id", description="Field to sort by (e.g., id, created_at)"),
+        direction: str = Query("desc", description="Sort direction: 'asc' for ascending, 'desc' for descending"),
+        current_user: models.User = Security(
         deps.get_current_active_user,
         scopes=[Role.ADMIN["name"], Role.SUPER_ADMIN["name"]],
     ),
@@ -59,7 +61,7 @@ def read_fulfillments(
 def update_fulfillment(
     *,
     db: Session = Depends(deps.get_db),
-    fulfillment_id: int,
+    fulfillment_id: int = Path(..., description= "The ID of the fulfillment to retrieve"),
     fulfillment_in: schemas.FulfillmentUpdate,
     current_user: models.User = Security(
         deps.get_current_active_user,
