@@ -78,6 +78,20 @@ def update_shipment(
             detail="The shipment does not exist in the system."
         )
 
+    if db_shipment.shipment_status == ShipmentStatus.FOREIGN_SHIPPING:
+        if shipment_in.weight <= 0:
+            raise HTTPException(
+                status_code=422,
+                detail="The weight of the shipment must be greater than 0."
+            )
+    elif db_shipment.shipment_status in [ShipmentStatus.VN_RECEIVED.value,
+                                       ShipmentStatus.VN_SHIPMENT_REQUESTED.value,
+                                       ShipmentStatus.VN_SHIPPED.value] and shipment_in.weight != db_shipment.weight:
+        raise HTTPException(
+            status_code=422,
+            detail="The weight can not be changed in the current status."
+        )
+
     db_consignment = crud.consignment.get(db, id=db_shipment.consignment_id)
     if not db_consignment:
         raise HTTPException(

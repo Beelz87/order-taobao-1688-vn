@@ -106,30 +106,12 @@ def create_consignment(
     consignment = crud.consignment.create(db, obj_in=consignment_in)
 
     if consignment_in.foreign_shipment_codes:
-        clone_weight_flag = True
         for code in consignment_in.foreign_shipment_codes:
-            if clone_weight_flag:
-                shipment_in = ShipmentCreate(consignment_id=consignment.id,
-                                             shipment_status=ShipmentStatus.FOREIGN_SHIPPING.value,
-                                             finance_status=ShipmentFinanceStatus.NOT_APPROVED.value,
-                                             code=code,
-                                             weight=consignment_in.weight,
-                                             height=consignment_in.height,
-                                             wide=consignment_in.wide,
-                                             length=consignment_in.length,
-                                             weight_packaged=consignment_in.weight_packaged,
-                                             height_packaged=consignment_in.height_packaged,
-                                             wide_packaged=consignment_in.wide_packaged,
-                                             length_packaged=consignment_in.length_packaged,
-                                             domestic_shipping_fee=consignment_in.domestic_shipping_fee
-                                             )
-                clone_weight_flag = False
-            else:
-                shipment_in = ShipmentCreate(consignment_id=consignment.id,
-                                             shipment_status=ShipmentStatus.FOREIGN_SHIPPING.value,
-                                             finance_status=ShipmentFinanceStatus.NOT_APPROVED.value,
-                                             code=code
-                                            )
+            shipment_in = ShipmentCreate(consignment_id=consignment.id,
+                                         shipment_status=ShipmentStatus.FOREIGN_SHIPPING.value,
+                                         finance_status=ShipmentFinanceStatus.NOT_APPROVED.value,
+                                         code=code
+                                         )
             crud.shipment.create(db, obj_in=shipment_in)
 
     consignment.image_path = consignment_in.image_path

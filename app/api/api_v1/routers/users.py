@@ -126,6 +126,8 @@ def read_user_me(
         email=current_user.email,
         is_active=current_user.is_active,
         full_name=current_user.full_name,
+        phone_number=current_user.phone_number,
+        user_code=current_user.user_code,
         created_at=current_user.created_at,
         updated_at=current_user.updated_at,
         user_role=role,
