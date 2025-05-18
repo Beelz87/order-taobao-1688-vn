@@ -7,6 +7,7 @@ from app import crud, models, schemas
 from app.api import deps
 from app.constants.role import Role
 from app.schemas.base.response import Response
+from app.services.user_role_service import assign_user_role_service, update_user_role_service
 
 router = APIRouter(prefix="/user-roles", tags=["user-roles"])
 
@@ -25,14 +26,7 @@ def assign_user_role(
     - **user_id** (`integer`, required): The ID of the user to retrieve.
     - **role_id** (`integer`, required): The ID of the role to assign to the user.
     """
-    user_role = crud.user_role.get_by_user_id(db, user_id=user_role_in.user_id)
-    if user_role:
-        raise HTTPException(
-            status_code=409,
-            detail="This user has already been assigned a role.",
-        )
-    user_role = crud.user_role.create(db, obj_in=user_role_in)
-
+    user_role = assign_user_role_service(db, user_role_in)
     return Response(message="", data=user_role)
 
 
@@ -55,13 +49,5 @@ def update_user_role(
     ## Request Body Parameters
     - **user_id** (`integer`, required): The ID of the user to retrieve.
     """
-    user_role = crud.user_role.get_by_user_id(db, user_id=user_id)
-    if not user_role:
-        raise HTTPException(
-            status_code=404, detail="There is no role assigned to this user",
-        )
-    user_role = crud.user_role.update(
-        db, db_obj=user_role, obj_in=user_role_in
-    )
-
+    user_role = update_user_role_service(db, user_id, user_role_in)
     return Response(message="", data=user_role)

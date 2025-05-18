@@ -94,10 +94,10 @@ def create_user(
     *,
     db: Session = Depends(deps.get_db),
     user_in: schemas.UserCreate,
-    current_user: models.User = Security(
-        deps.get_current_active_user,
-        scopes=[Role.ADMIN["name"], Role.SUPER_ADMIN["name"]],
-    ),
+    # current_user: models.User = Security(
+    #     deps.get_current_active_user,
+    #     scopes=[Role.ADMIN["name"], Role.SUPER_ADMIN["name"]],
+    # ),
 ) -> Any:
     """
     Create new user.

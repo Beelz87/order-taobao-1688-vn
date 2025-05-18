@@ -7,6 +7,8 @@ from app import crud, models, schemas
 from app.api import deps
 from app.constants.role import Role
 from app.schemas.base.response import Response
+from app.services.account_service import create_account_service, update_account_service, add_user_to_account_service, \
+    get_users_for_account_service, get_users_for_own_account_service
 
 router = APIRouter(prefix="/accounts", tags=["accounts"])
 
@@ -56,13 +58,7 @@ def create_account(
     """
     Create an user account
     """
-    account = crud.account.get_by_name(db, name=account_in.name)
-    if account:
-        raise HTTPException(
-            status_code=409, detail="An account with this name already exists",
-        )
-    account = crud.account.create(db, obj_in=account_in)
-
+    account = create_account_service(db, account_in)
     return Response(message="", data=account)
 
 
@@ -84,24 +80,7 @@ def update_account(
     """
     Update an account.
     """
-
-    # If user is an account admin, check ensure they update their own account.
-    if current_user.user_role.role.name == Role.ACCOUNT_ADMIN["name"]:
-        if current_user.account_id != account_id:
-            raise HTTPException(
-                status_code=401,
-                detail=(
-                    "This user does not have the permissions to "
-                    "update this account"
-                ),
-            )
-    account = crud.account.get(db, id=account_id)
-    if not account:
-        raise HTTPException(
-            status_code=404, detail="Account does not exist",
-        )
-    account = crud.account.update(db, db_obj=account, obj_in=account_in)
-
+    account = update_account_service(db, account_id, account_in, current_user)
     return Response(message="", data=account)
 
 
@@ -116,19 +95,7 @@ def add_user_to_account(
     """
     Add a user to an account.
     """
-    account = crud.account.get(db, id=account_id)
-    if not account:
-        raise HTTPException(
-            status_code=404, detail="Account does not exist",
-        )
-    user = crud.user.get(db, id=user_id)
-    if not user:
-        raise HTTPException(
-            status_code=404, detail="User does not exist",
-        )
-    user_in = schemas.UserUpdate(account_id=account_id)
-    updated_user = crud.user.update(db, db_obj=user, obj_in=user_in)
-
+    updated_user = add_user_to_account_service(db, account_id, user_id)
     return Response(message="", data=updated_user)
 
 
@@ -147,15 +114,7 @@ def retrieve_users_for_account(
     """
     Retrieve users for an account.
     """
-    account = crud.account.get(db, id=account_id)
-    if not account:
-        raise HTTPException(
-            status_code=404, detail="Account does not exist",
-        )
-    account_users = crud.user.get_by_account_id(
-        db, account_id=account_id, skip=skip, limit=limit
-    )
-
+    account_users = get_users_for_account_service(db, account_id, skip, limit)
     return Response(message="", data=account_users)
 
 
@@ -177,13 +136,5 @@ def retrieve_users_for_own_account(
     """
     Retrieve users for own account.
     """
-    account = crud.account.get(db, id=current_user.account_id)
-    if not account:
-        raise HTTPException(
-            status_code=404, detail="Account does not exist",
-        )
-    account_users = crud.user.get_by_account_id(
-        db, account_id=account.id, skip=skip, limit=limit
-    )
-
+    account_users = get_users_for_own_account_service(db, current_user, skip, limit)
     return Response(message="", data=account_users)

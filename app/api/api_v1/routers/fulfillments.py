@@ -7,6 +7,7 @@ from app import schemas, models, crud
 from app.api import deps
 from app.constants.role import Role
 from app.schemas.base.response import Response
+from app.services.fulfillment_service import update_fulfillment_service
 
 router = APIRouter(prefix="/fulfillments", tags=["fulfillments"])
 
@@ -71,14 +72,5 @@ def update_fulfillment(
     """
     Update fulfillment.
     """
-    fulfillment = crud.fulfillment.get(db, id=fulfillment_id)
-    if not fulfillment:
-        raise HTTPException(
-            status_code=404,
-            detail="The fulfillment does not exist in the system."
-        )
-
-    fulfillment = crud.fulfillment.update(db, db_obj=fulfillment, obj_in=fulfillment_in)
-    fulfillment.consignment = crud.consignment.get(db, id=fulfillment.consignment_id)
-
+    fulfillment = update_fulfillment_service(db, fulfillment_id, fulfillment_in)
     return Response(message="", data=fulfillment)

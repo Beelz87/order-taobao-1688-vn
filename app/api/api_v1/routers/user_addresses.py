@@ -7,6 +7,7 @@ from app import schemas, models, crud
 from app.api import deps
 from app.constants.role import Role
 from app.schemas.base.response import Response
+from app.services.user_addresses_service import update_user_address_service
 
 router = APIRouter(prefix="/user_addresses", tags=["user_addresses"])
 
@@ -94,19 +95,5 @@ def update_user_address(
     - **is_active** (`boolean`, optional): Indicates whether this address is currently active. Default is True.
 
     """
-    final_user_id = get_user_id_from_role(current_user, user_id)
-    user_address = crud.user_address.get(db, user_address_id)
-    if not user_address:
-        raise HTTPException(
-            status_code=404,
-            detail="The user address does not exist in the system.",
-        )
-    if user_address.user_id != final_user_id:
-        raise HTTPException(
-            status_code=403,
-            detail="You do not have permission to update this address.",
-        )
-
-    user_address = crud.user_address.update(db, db_obj=user_address, obj_in=address_in, user_id=final_user_id)
-
-    return Response(message="", data=user_address)
+    updated_address = update_user_address_service(db, user_address_id, address_in, current_user, user_id)
+    return Response(message="", data=updated_address)
