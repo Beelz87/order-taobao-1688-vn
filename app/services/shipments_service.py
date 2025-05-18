@@ -19,7 +19,7 @@ def update_shipment_service(
             detail="The shipment does not exist in the system."
         )
 
-    if db_shipment.shipment_status == ShipmentStatus.FOREIGN_SHIPPING:
+    if db_shipment.shipment_status == ShipmentStatus.FOREIGN_SHIPPING.value:
         if shipment_in.weight <= 0:
             raise HTTPException(
                 status_code=422,
