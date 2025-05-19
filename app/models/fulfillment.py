@@ -11,6 +11,9 @@ class Fulfillment(Base):
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
 
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True, default=None)
+    user = relationship("User", back_populates="fulfillments")
+
     consignment_id = Column(Integer(), ForeignKey("consignments.id"), nullable=False)
     consignment = relationship("Consignment", back_populates="fulfillments")
 

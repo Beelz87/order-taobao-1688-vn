@@ -76,6 +76,7 @@ class ShipmentUpdate(BaseModel):
 
 class ShipmentInDBBase(ShipmentBase):
     id: int
+    user_id: Optional[int]
     consignment: Optional[Consignment]
     created_at: datetime
     updated_at: datetime

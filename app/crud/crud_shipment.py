@@ -59,6 +59,8 @@ class CRUDShipment(CRUDBase[Shipment, ShipmentCreate, ShipmentUpdate]):
         else:
             update_data = obj_in.model_dump(exclude_unset=True)
 
+        update_data["user_id"] = current_user_id
+
         changes = []
         for field, new_value in update_data.items():
             old_value = getattr(db_obj, field)
