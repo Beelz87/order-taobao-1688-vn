@@ -7,6 +7,7 @@ from app import schemas, models, crud
 from app.api import deps
 from app.constants.role import Role
 from app.schemas.base.response import Response
+from app.services.store_service import update_store_service
 
 router = APIRouter(prefix="/stores", tags=["stores"])
 
@@ -72,10 +73,10 @@ def update_store(
     db: Session = Depends(deps.get_db),
     store_id: int = Path(..., description="The ID of the store to retrieve."),
     store_in: schemas.StoreUpdate,
-    current_user: models.User = Security(
-        deps.get_current_active_user,
-        scopes=[Role.SUPER_ADMIN["name"]],
-    ),
+    # current_user: models.User = Security(
+    #     deps.get_current_active_user,
+    #     scopes=[Role.SUPER_ADMIN["name"]],
+    # ),
 ) -> Any:
     """
     update store.
@@ -90,12 +91,5 @@ def update_store(
 
 
     """
-    store = crud.store.get(db, id=store_id)
-    if not store:
-        raise HTTPException(
-            status_code=404,
-            detail="The store does not exist in the system.",
-        )
-    store = crud.store.update(db, db_obj=store, obj_in=store_in)
-
+    store = update_store_service(db, store_id, store_in)
     return Response(message="", data=store)

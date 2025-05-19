@@ -7,6 +7,7 @@ from app import schemas, models, crud
 from app.api import deps
 from app.constants.role import Role
 from app.schemas.base.response import Response
+from app.services.change_log_service import get_change_log_by_id
 
 router = APIRouter(prefix="/change_logs", tags=["change_logs"])
 
@@ -76,11 +77,5 @@ def read_change_log(
     """
     Get a specific change log by ID.
     """
-    change_log = crud.change_log.get(db, id=change_log_id)
-    if not change_log:
-        raise HTTPException(
-            status_code=404,
-            detail="Change log not found.",
-        )
-
+    change_log = get_change_log_by_id(db, change_log_id)
     return Response(message="", data=change_log)

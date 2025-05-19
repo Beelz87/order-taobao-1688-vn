@@ -7,6 +7,7 @@ from app import schemas, models, crud
 from app.api import deps
 from app.constants.role import Role
 from app.schemas.base.response import Response
+from app.services.product_category_service import update_product_category_service
 
 router = APIRouter(prefix="/product-categories", tags=["product-categories"])
 
@@ -80,12 +81,6 @@ def update_product_category(
     - **level** (`integer`, optional): Hierarchical level of the category .
     - **is_active** (`boolean`, optional): Whether the category is currently active.
     """
-    product_category = crud.product_category.get(db, id=product_category_id)
-    if not product_category:
-        raise HTTPException(
-            status_code=404,
-            detail="The product category does not exist in the system.",
-        )
-    product_category = crud.product_category.update(db, db_obj=product_category, obj_in=product_category_in)
+    product_category = update_product_category_service(db, product_category_id, product_category_in)
 
     return Response(message="", data=product_category)
