@@ -102,7 +102,8 @@ def _create_fulfillment_if_possible(db: Session, shipment: models.Shipment, cons
         consignment_id=shipment.consignment_id,
         shipment_id=shipment.id,
         status=FulfillmentStatus.WAITING.value,
-        shipping_type=FulfillmentShippingType.BUS_SHIPMENT.value
+        shipping_type=FulfillmentShippingType.BUS_SHIPMENT.value,
+        user_id=shipment.user_id
     )
     crud.fulfillment.create(db, obj_in=fulfillment_in)
 

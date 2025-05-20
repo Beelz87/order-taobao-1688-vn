@@ -17,7 +17,8 @@ class CRUDFulfillment(CRUDBase[Fulfillment, FulfillmentCreate, FulfillmentUpdate
             consignment_id=obj_in.consignment_id,
             shipment_id=obj_in.shipment_id,
             status=obj_in.status,
-            shipping_type=obj_in.shipping_type
+            shipping_type=obj_in.shipping_type,
+            user_id=obj_in.user_id
         )
         db.add(db_obj)
         db.commit()

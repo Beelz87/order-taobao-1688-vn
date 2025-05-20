@@ -18,6 +18,7 @@ class FulfillmentBase(BaseModel):
 
 # Properties to receive via API on creation
 class FulfillmentCreate(FulfillmentBase):
+    user_id: Optional[int] = None
     pass
 
 
