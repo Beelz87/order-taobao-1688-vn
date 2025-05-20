@@ -41,6 +41,7 @@ class ShipmentBase(BaseModel):
 
 # Properties to receive via API on creation
 class ShipmentCreate(ShipmentBase):
+    user_id: Optional[int] = None
     pass
 
 
