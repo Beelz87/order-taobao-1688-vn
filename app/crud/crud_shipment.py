@@ -35,7 +35,8 @@ class CRUDShipment(CRUDBase[Shipment, ShipmentCreate, ShipmentUpdate]):
             item_count_check_required_fee=obj_in.item_count_check_required_fee,
             note=obj_in.note,
             code=obj_in.code,
-            domestic_shipping_fee=obj_in.domestic_shipping_fee
+            domestic_shipping_fee=obj_in.domestic_shipping_fee,
+            user_id = obj_in.user_id
         )
         db.add(db_obj)
         db.commit()
@@ -58,6 +59,8 @@ class CRUDShipment(CRUDBase[Shipment, ShipmentCreate, ShipmentUpdate]):
             update_data = obj_in
         else:
             update_data = obj_in.model_dump(exclude_unset=True)
+
+        update_data["user_id"] = current_user_id
 
         changes = []
         for field, new_value in update_data.items():

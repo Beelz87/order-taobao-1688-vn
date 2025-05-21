@@ -72,5 +72,5 @@ def update_fulfillment(
     """
     Update fulfillment.
     """
-    fulfillment = update_fulfillment_service(db, fulfillment_id, fulfillment_in)
+    fulfillment = update_fulfillment_service(db, fulfillment_id, fulfillment_in, updated_by=current_user.id)
     return Response(message="", data=fulfillment)

@@ -34,3 +34,5 @@ class User(Base):
     deposit_bills = relationship("DepositBill", back_populates="user")
     user_addresses = relationship("UserAddress", back_populates="user")
     user_finance = relationship("UserFinance", back_populates="user", uselist=False)
+    shipments = relationship("Shipment", back_populates="user")
+    fulfillments = relationship("Fulfillment", back_populates="user")

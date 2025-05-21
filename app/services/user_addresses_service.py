@@ -4,7 +4,7 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from app import schemas, models, crud
-from app.api.api_v1.routers.user_addresses import get_user_id_from_role
+from app.utils.roles import get_user_id_from_role
 
 
 def update_user_address_service(
