@@ -11,7 +11,7 @@ class Shipment(Base):
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
 
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=True, default=None)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     user = relationship("User", back_populates="shipments")
 
     consignment_id = Column(Integer, ForeignKey("consignments.id"), nullable=False)
