@@ -68,15 +68,11 @@ def read_shipments(
     if foreign_shipment_code is not None:
         filters["code"] = foreign_shipment_code
 
-    shipments = []
-    if (current_user.user_role.role.name == Role.ADMIN["name"] or
-            current_user.user_role.role.name == Role.SUPER_ADMIN["name"]):
-        shipments = crud.shipment.get_multi(db, skip=skip, limit=limit, filters=filters,
-                                                 order_by=order_by, direction=direction)
-    elif current_user.user_role.role.name == Role.USER["name"]:
+    if current_user.user_role.role.name == Role.USER["name"]:
         filters["user_id"] = current_user.id
-        shipments = crud.shipment.get_multi(db, skip=skip, limit=limit, filters=filters,
-                                                 order_by=order_by, direction=direction)
+
+    shipments = crud.shipment.get_multi(db, skip=skip, limit=limit, filters=filters,
+                                             order_by=order_by, direction=direction)
 
     # shipments = crud.shipment.get_multi(db, skip=skip, limit=limit, filters=filters,
     #                                           order_by=order_by, direction=direction)
