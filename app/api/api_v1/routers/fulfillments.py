@@ -26,7 +26,7 @@ def read_fulfillments(
         direction: str = Query("desc", description="Sort direction: 'asc' for ascending, 'desc' for descending"),
         current_user: models.User = Security(
         deps.get_current_active_user,
-        scopes=[Role.ADMIN["name"], Role.SUPER_ADMIN["name"]],
+        scopes=[Role.ADMIN["name"], Role.SUPER_ADMIN["name"], Role.USER["name"]],
     ),
 ) -> Any:
     """
@@ -52,6 +52,9 @@ def read_fulfillments(
                     detail="The shipments do not exist in the system."
                 )
             filters["shipment_id"] = [shipment.id for shipment in shipments]
+
+    if current_user.user_role.role.name == Role.USER["name"]:
+        filters["user_id"] = current_user.id
 
     fulfillments = crud.fulfillment.get_multi(db, skip=skip, limit=limit, filters=filters,
                                               order_by=order_by, direction=direction)
